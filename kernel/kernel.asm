@@ -1,4 +1,4 @@
-SELECTOR_KERNEL_CS	equ	8		;SelectorFlatC
+%include "include/sconst.inc"
 
 ;global func
 extern cstart
@@ -9,6 +9,8 @@ extern	kernel_main
 ;global var
 extern gdt_ptr
 extern idt_ptr
+extern	p_proc_ready
+extern	tss
 
 ;exception
 global	divide_error
@@ -45,11 +47,14 @@ global  hwint13
 global  hwint14
 global  hwint15
 
+global restart
+global _start	; 导出 _start
+
 [section .bss]
 StackSpace		resb	2 * 1024
 StackTop:
 
-global _start	; 导出 _start
+
 
 [section .text]
 
@@ -70,6 +75,10 @@ csinit:
 	;jmp 0x40:0 ;Page Fault
 	;push	0
 	;popfd		;Change EFlag
+
+	xor	eax, eax
+	mov	ax, SELECTOR_TSS
+	ltr	ax
 
 	jmp kernel_main
 

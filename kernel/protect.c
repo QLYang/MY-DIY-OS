@@ -1,12 +1,13 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 
 /* 本文件内函数声明 */
-PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,
-			   int_handler handler, unsigned char privilege);
+PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,int_handler handler, unsigned char privilege);
+PRIVATE void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute);
 
 /* 中断处理函数 */
 void	divide_error();
@@ -100,51 +101,49 @@ PUBLIC void init_prot()
 	/*initialize IRQ*/
 	init_idt_desc(INT_VECTOR_IRQ0 + 0,      DA_386IGate,
                       hwint00,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 1,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 1,      DA_386IGate,
                       hwint01,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 2,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 2,      DA_386IGate,
                       hwint02,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 3,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 3,      DA_386IGate,
                       hwint03,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 4,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 4,      DA_386IGate,
                       hwint04,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 5,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 5,      DA_386IGate,
                       hwint05,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 6,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 6,      DA_386IGate,
                       hwint06,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ0 + 7,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ0 + 7,      DA_386IGate,
                       hwint07,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 0,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 0,      DA_386IGate,
                       hwint08,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 1,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 1,      DA_386IGate,
                       hwint09,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 2,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 2,      DA_386IGate,
                       hwint10,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 3,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 3,      DA_386IGate,
                       hwint11,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 4,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 4,      DA_386IGate,
                       hwint12,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 5,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 5,      DA_386IGate,
                       hwint13,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 6,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 6,      DA_386IGate,
                       hwint14,                  PRIVILEGE_KRNL);
-
-        init_idt_desc(INT_VECTOR_IRQ8 + 7,      DA_386IGate,
+    init_idt_desc(INT_VECTOR_IRQ8 + 7,      DA_386IGate,
                       hwint15,                  PRIVILEGE_KRNL);
+
+	/* 填充 GDT 中 TSS 这个描述符 */
+	memset(&tss, 0, sizeof(tss));
+	tss.ss0 = SELECTOR_KERNEL_DS;
+	init_descriptor(&gdt[INDEX_TSS],vir2phys(seg2phys(SELECTOR_KERNEL_DS), &tss),
+					sizeof(tss) - 1,
+					DA_386TSS);
+	tss.iobase = sizeof(tss); /* 没有I/O许可位图 */
+
+	/* 填充 GDT 中进程的 LDT 的描述符 */
+	init_descriptor(&gdt[INDEX_LDT_FIRST],vir2phys(seg2phys(SELECTOR_KERNEL_DS), proc_table[0].ldts),
+					LDT_SIZE * sizeof(DESCRIPTOR) - 1,
+					DA_LDT);
 }
 
 /*======================================================================*
@@ -162,6 +161,32 @@ PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,
 	p_gate->dcount		= 0;
 	p_gate->attr		= desc_type | (privilege << 5);
 	p_gate->offset_high	= (base >> 16) & 0xFFFF;
+}
+
+/*======================================================================*
+                           init_descriptor
+ *----------------------------------------------------------------------*
+ 初始化段描述符
+ *======================================================================*/
+PRIVATE void init_descriptor(DESCRIPTOR *p_desc,u32 base,u32 limit,u16 attribute)
+{
+	p_desc->limit_low	= limit & 0x0FFFF;
+	p_desc->base_low	= base & 0x0FFFF;
+	p_desc->base_mid	= (base >> 16) & 0x0FF;
+	p_desc->attr1		= attribute & 0xFF;
+	p_desc->limit_high_attr2= ((limit>>16) & 0x0F) | (attribute>>8) & 0xF0;
+	p_desc->base_high	= (base >> 24) & 0x0FF;
+}
+
+/*======================================================================*
+                           seg2phys
+ *----------------------------------------------------------------------*
+ 由段名求绝对地址
+ *======================================================================*/
+PUBLIC u32 seg2phys(u16 seg)
+{
+	DESCRIPTOR* p_dest = &gdt[seg >> 3];
+	return (p_dest->base_high<<24 | p_dest->base_mid<<16 | p_dest->base_low);
 }
 
 /*======================================================================*
