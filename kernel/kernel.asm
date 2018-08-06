@@ -4,6 +4,7 @@ SELECTOR_KERNEL_CS	equ	8		;SelectorFlatC
 extern cstart
 extern	exception_handler
 extern	spurious_irq
+extern	kernel_main
 
 ;global var
 extern gdt_ptr
@@ -64,12 +65,15 @@ _start:	; 跳到这里来的时候，我们假设 gs 指向显存
 	jmp	SELECTOR_KERNEL_CS:csinit
 
 csinit:
-	sti
+	;sti
 	;ud2			;error
 	;jmp 0x40:0 ;Page Fault
-
 	;push	0
 	;popfd		;Change EFlag
+
+	jmp kernel_main
+
+
 	hlt
 
 ;======================================

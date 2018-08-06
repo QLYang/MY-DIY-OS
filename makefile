@@ -8,7 +8,8 @@ src6=kernel/init8259A.c
 src7=kernel/global.c
 src8=kernel/protect.c
 src9=lib/k_liba.c
-src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9)
+src10=kernel/main.c
+src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10)
 #Target
 debug_tar1=boot.com
 debug_tar2=loader.bin
@@ -66,9 +67,10 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src7) -o global.o
 	gcc $(gcc-flag) -c $(src8) -o protect.o
 	gcc $(gcc-flag) -c $(src9) -o k_liba.o
+	gcc $(gcc-flag) -c $(src10) -o main.o
 
 	ld -s -Ttext 0x30400 -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
-	global.o k_liba.o protect.o -o $(tar3)
+	global.o k_liba.o protect.o main.o -o $(tar3)
 
 	sudo mount -o loop $(img) /mnt/floppy/
 	sudo cp $(tar3) /mnt/floppy/ -v
