@@ -4,6 +4,7 @@ PUBLIC void	disp_str(char * info);
 PUBLIC u8	in_byte(u16 port);
 PUBLIC	void*	memcpy(void* pDst, void* pSrc, int iSize);
 PUBLIC	void	memset(void* p_dst, char ch, int size);
+PUBLIC
 /* klib.c */
 PUBLIC void	delay(int time);
 
@@ -16,3 +17,5 @@ void restart();
 
 /* main.c */
 void TestA();
+void TestB();
+void TestC();

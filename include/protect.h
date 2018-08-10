@@ -122,7 +122,7 @@ typedef struct s_tss {
 #define	DA_386IGate		0x8E	/* 386 中断门类型值			*/
 #define	DA_386TGate		0x8F	/* 386 陷阱门类型值			*/
 
-/* 其中, SA_ : Selector Attribute */
+/* Selector Attribute */
 #define	SA_RPL_MASK	0xFFFC
 #define	SA_RPL0		0
 #define	SA_RPL1		1
