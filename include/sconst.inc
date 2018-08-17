@@ -1,4 +1,4 @@
-;s_proc structure
+;s_proc 结构
 P_STACKBASE	equ	0
 GSREG		equ	P_STACKBASE
 FSREG		equ	GSREG		+ 4
@@ -23,12 +23,12 @@ P_LDT_SEL	equ	P_STACKTOP
 
 TSS3_S_SP0	equ	4
 
-; 以下选择子值必须与 protect.h 中保持一致!!!
+; 以下选择子值与 protect.h 中保持一致
 SELECTOR_FLAT_C		equ		0x08	; LOADER 里面已经确定了的.
 SELECTOR_TSS		equ		0x20	; TSS
 SELECTOR_KERNEL_CS	equ		SELECTOR_FLAT_C
 
-;interupt setting
+;设置8259A的端口
 INT_M_CTL	equ	0x20 ; I/O port for interrupt controller        <Master>
 INT_M_CTLMASK	equ	0x21 ; setting bits in this port disables ints  <Master>
 INT_S_CTL	equ	0xA0 ; I/O port for second interrupt controller <Slave>

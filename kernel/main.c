@@ -13,7 +13,7 @@ PUBLIC int kernel_main()
 {
 	disp_str("-----\"kernel_main\" begins-----\n");
 
-	kernel_reenter=-1;
+	kernel_reenter=0;
 
 	TASK*		p_task		= task_table;
 	PROCESS*	p_proc		= proc_table;
@@ -46,6 +46,10 @@ PUBLIC int kernel_main()
 		selector_ldt += 1 << 3;
 	}
 	p_proc_ready	= proc_table;
+
+	put_irq_handler(CLOCK_IRQ, clock_handler); /* 设定时钟中断处理程序 */
+    enable_irq(CLOCK_IRQ);
+
 	restart();
 
 	while(1){}

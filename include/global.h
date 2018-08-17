@@ -17,3 +17,4 @@ extern	PROCESS		proc_table[];
 extern	char		task_stack[];
 extern	TASK		task_table[];
 EXTERN  u32 kernel_reenter;
+extern	irq_handler		irq_table[];

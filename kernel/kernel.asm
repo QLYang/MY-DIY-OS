@@ -15,6 +15,7 @@ extern idt_ptr
 extern	p_proc_ready
 extern	tss
 extern	kernel_reenter
+extern irq_table
 
 ;exception
 global	divide_error
@@ -155,58 +156,28 @@ exception:
 ;=======================================
 ; 中断和异常 -- 硬件中断
 ; ---------------------------
-%macro  hwint_master    1
-        push    %1
-        call    spurious_irq
-        add     esp, 4
-        hlt
+%macro	hwint_master	1
+	call	save
+	in	al, INT_M_CTLMASK	; `.
+	or	al, (1 << %1)		;  | 屏蔽当前中断
+	out	INT_M_CTLMASK, al	; /
+	mov	al, EOI			; `. 置EOI位
+	out	INT_M_CTL, al		; /
+	sti	; CPU在响应中断的过程中会自动关中断，这句之后就允许响应新的中断
+	push	%1			; `.
+	call	[irq_table + 4 * %1]	;  | 中断处理程序
+	pop	ecx			; /
+	cli
+	in	al, INT_M_CTLMASK	; `.
+	and	al, ~(1 << %1)		;  | 恢复接受当前中断
+	out	INT_M_CTLMASK, al	; /
+	ret
 %endmacro
 ; ---------------------------
 
 ALIGN   16
 hwint00:                ; Interrupt routine for irq 0 (the clock).
-		sub	esp,4
-		pushad		; `.
-		push	ds	;  |
-		push	es	;  | 保存原寄存器值
-		push	fs	;  |
-		push	gs	; /
-		mov	dx, ss
-		mov	ds, dx
-		mov	es, dx
-
-		inc	byte [gs:0]	; 改变屏幕第 0 行, 第 0 列的字符
-
-		mov	al, EOI		; `. reenable
-		out	INT_M_CTL, al	; /  master 8259
-
-		inc dword [kernel_reenter]
-		cmp	dword [kernel_reenter],0
-		jne	.reenter
-
-		mov esp,StackTop	;switch to kernel_stack
-		sti
-		;------------------------------
-		push	0
-		call	clock_handler
-		add		esp,4
-		;------------------------------
-		cli
-		mov esp,[p_proc_ready]		;leave kernel_stack
-		lea	eax, [esp + P_STACKTOP]
-		mov	dword [tss + TSS3_S_SP0], eax
-
-.reenter:
-		dec dword	[kernel_reenter]
-		pop	gs	; `.
-		pop	fs	;  |
-		pop	es	;  | 恢复原寄存器值
-		pop	ds	;  |
-		popad		; /
-		add	esp,4
-
-		iretd
-
+		hwint_master    0
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)
         hwint_master    1
@@ -275,7 +246,31 @@ hwint14:                ; Interrupt routine for irq 14 (AT winchester)
 ALIGN   16
 hwint15:                ; Interrupt routine for irq 15
         hwint_slave     15
+; ====================================================================================
+;                                   save
+; ====================================================================================
+save:
+        pushad          ; `.
+        push    ds      ;  |
+        push    es      ;  | 保存原寄存器值
+        push    fs      ;  |
+        push    gs      ; /
+        mov     dx, ss
+        mov     ds, dx
+        mov     es, dx
 
+        mov     eax, esp                    ;eax = 进程表起始地址
+
+        inc     dword [kernel_reenter]           ;k_reenter++;
+        cmp     dword [kernel_reenter], 0        ;if(k_reenter ==0)
+        jne     .1                          ;{
+        mov     esp, StackTop               ;  mov esp, StackTop <--切换到内核栈
+        push    restart                     ;  push restart
+        jmp     [eax + RETADR];  return;
+.1:                                         ;} else {
+        push    restart_reenter             ;  push restart_reenter
+        jmp     [eax + RETADR ]				;  return;
+                                            ;}
 ; ====================================================================================
 ;                                   restart
 ; ====================================================================================
@@ -284,13 +279,12 @@ restart:
 	lldt	[esp + P_LDT_SEL]
 	lea	eax, [esp + P_STACKTOP]
 	mov	dword [tss + TSS3_S_SP0], eax
-
+restart_reenter:
+	dec	dword [kernel_reenter]
 	pop	gs
 	pop	fs
 	pop	es
 	pop	ds
 	popad
-
 	add	esp, 4
-
 	iretd
