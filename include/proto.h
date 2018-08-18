@@ -26,3 +26,9 @@ PUBLIC void spurious_irq(int irq);
 
 /* clock.c */
 PUBLIC void clock_handler(int irq);
+
+/*proc.c*/
+PUBLIC int sys_get_ticks();
+PUBLIC void sys_call();
+/*syscall.asm*/
+PUBLIC int get_ticks();

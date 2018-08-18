@@ -139,4 +139,7 @@ typedef struct s_tss {
 /* 线性地址 → 物理地址 */
 #define vir2phys(seg_base, vir)	(u32)(((u32)seg_base) + (u32)(vir))
 
+/* 系统调用 */
+#define INT_VECTOR_SYS_CALL             0x90
+
 #endif

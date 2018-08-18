@@ -1,8 +1,8 @@
-#include "../include/type.h"
-#include "../include/const.h"
-#include "../include/protect.h"
-#include "../include/proc.h"
-#include "../include/global.h"
+#include "type.h"
+#include "const.h"
+#include "protect.h"
+#include "proc.h"
+#include "global.h"
 
 PUBLIC void cstart()
 {

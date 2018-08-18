@@ -1,6 +1,6 @@
 %include "include/sconst.inc"
 
-;global func
+;extern func
 extern cstart
 extern	exception_handler
 extern	spurious_irq
@@ -9,13 +9,14 @@ extern  disp_str
 extern  delay
 extern	clock_handler
 
-;global var
+;extern var
 extern gdt_ptr
 extern idt_ptr
 extern	p_proc_ready
 extern	tss
 extern	kernel_reenter
 extern irq_table
+extern	sys_call_table
 
 ;exception
 global	divide_error
@@ -52,8 +53,10 @@ global  hwint13
 global  hwint14
 global  hwint15
 
+;global func
 global restart
-global _start	; 导出 _start
+global _start
+global sys_call
 
 [section .bss]
 StackSpace		resb	2 * 1024
@@ -64,7 +67,7 @@ clock_init_msg  db "^",0
 
 [section .text]
 
-_start:	; 跳到这里来的时候，我们假设 gs 指向显存
+_start:	; 跳到这里来的时候，假设 gs 指向显存
 	mov esp,StackTop	;mov stackPointer to .bss
 
 	sgdt	[gdt_ptr]
@@ -90,6 +93,7 @@ csinit:
 
 ;======================================
 ; 中断和异常 -- 异常
+;======================================
 divide_error:
 	push	0xFFFFFFFF	; no err code
 	push	0		; vector_no	= 0
@@ -153,27 +157,31 @@ exception:
 	call	exception_handler
 	add	esp, 4*2	; 让栈顶指向 EIP，堆栈中从顶向下依次是：EIP、CS、EFLAGS
 	hlt
-;=======================================
+;======================================
 ; 中断和异常 -- 硬件中断
-; ---------------------------
+;======================================
 %macro	hwint_master	1
 	call	save
-	in	al, INT_M_CTLMASK	; `.
-	or	al, (1 << %1)		;  | 屏蔽当前中断
-	out	INT_M_CTLMASK, al	; /
-	mov	al, EOI			; `. 置EOI位
-	out	INT_M_CTL, al		; /
-	sti	; CPU在响应中断的过程中会自动关中断，这句之后就允许响应新的中断
-	push	%1			; `.
-	call	[irq_table + 4 * %1]	;  | 中断处理程序
-	pop	ecx			; /
+
+	in	al, INT_M_CTLMASK			;
+	or	al, (1 << %1)				;屏蔽当前中断
+	out	INT_M_CTLMASK, al			;
+
+	mov	al, EOI						;置EOI位
+	out	INT_M_CTL, al				;
+
+	sti								; CPU在响应中断的过程中会自动关中断，这句之后就允许响应新的中断
+	push	%1						;
+	call	[irq_table + 4 * %1]	; 中断处理程序
+	pop	ecx							;
 	cli
-	in	al, INT_M_CTLMASK	; `.
-	and	al, ~(1 << %1)		;  | 恢复接受当前中断
-	out	INT_M_CTLMASK, al	; /
+
+	in	al, INT_M_CTLMASK			;
+	and	al, ~(1 << %1)				;恢复接受当前中断
+	out	INT_M_CTLMASK, al			;
 	ret
 %endmacro
-; ---------------------------
+; -------------------------------------
 
 ALIGN   16
 hwint00:                ; Interrupt routine for irq 0 (the clock).
@@ -206,14 +214,14 @@ ALIGN   16
 hwint07:                ; Interrupt routine for irq 7 (printer)
         hwint_master    7
 
-; ---------------------------------
+; -------------------------------------
 %macro  hwint_slave     1
         push    %1
         call    spurious_irq
         add     esp, 4
         hlt
 %endmacro
-; ---------------------------------
+; -------------------------------------
 
 ALIGN   16
 hwint08:                ; Interrupt routine for irq 8 (realtime clock).
@@ -246,9 +254,9 @@ hwint14:                ; Interrupt routine for irq 14 (AT winchester)
 ALIGN   16
 hwint15:                ; Interrupt routine for irq 15
         hwint_slave     15
-; ====================================================================================
-;                                   save
-; ====================================================================================
+; =====================================
+;             save
+; =====================================
 save:
         pushad          ; `.
         push    ds      ;  |
@@ -259,21 +267,21 @@ save:
         mov     ds, dx
         mov     es, dx
 
-        mov     eax, esp                    ;eax = 进程表起始地址
+        mov     esi, esp                    ;eax = 进程表起始地址
 
         inc     dword [kernel_reenter]           ;k_reenter++;
         cmp     dword [kernel_reenter], 0        ;if(k_reenter ==0)
         jne     .1                          ;{
         mov     esp, StackTop               ;  mov esp, StackTop <--切换到内核栈
         push    restart                     ;  push restart
-        jmp     [eax + RETADR];  return;
+        jmp     [esi + RETADR];  return;
 .1:                                         ;} else {
         push    restart_reenter             ;  push restart_reenter
-        jmp     [eax + RETADR ]				;  return;
+        jmp     [esi + RETADR ]				;  return;
                                             ;}
-; ====================================================================================
-;                                   restart
-; ====================================================================================
+; =====================================
+;         restart
+; =====================================
 restart:
 	mov	esp, [p_proc_ready]
 	lldt	[esp + P_LDT_SEL]
@@ -288,3 +296,17 @@ restart_reenter:
 	popad
 	add	esp, 4
 	iretd
+
+;======================================
+;			sys_call
+;======================================
+sys_call:
+	call save
+	sti
+
+	call [sys_call_table+eax*4]
+	mov	[esi+EAXREG],eax			;return
+
+	cli
+
+	ret
