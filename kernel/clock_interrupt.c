@@ -7,6 +7,7 @@
 
 PUBLIC void clock_handler(int irq){
 	disp_str("#");
+	ticks++;
 	if (kernel_reenter!=0){
 		disp_str("!");
 		return;

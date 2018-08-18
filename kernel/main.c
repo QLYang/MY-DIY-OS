@@ -13,6 +13,7 @@ PUBLIC int kernel_main()
 {
 	disp_str("-----\"kernel_main\" begins-----\n");
 
+	ticks=0;/*在sys_get_ticks()中使用*/
 	kernel_reenter=0;
 
 	TASK*		p_task		= task_table;
@@ -62,9 +63,8 @@ void TestA()
 {
 	int i = 0;
 	while(1){
-		get_ticks();
 		disp_str("A");
-		disp_int(i++);
+		disp_int(get_ticks());
 		disp_str(".");
 		delay(1);
 	}
@@ -77,7 +77,6 @@ void TestB()
 	int i = 0;
 	while(1){
 		disp_str("B");
-		disp_int(i++);
 		disp_str(".");
 		delay(1);
 	}
@@ -90,7 +89,6 @@ void TestC()
 	int i = 0;
 	while(1){
 		disp_str("C");
-		disp_int(i++);
 		disp_str(".");
 		delay(1);
 	}
