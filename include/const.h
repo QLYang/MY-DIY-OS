@@ -44,4 +44,7 @@
 /*系统调用*/
 #define	NR_SYS_CALL	1	/* at winchester */
 
+#define TRUE 1
+#define FALSE 0
+
 #endif

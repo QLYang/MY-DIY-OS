@@ -11,7 +11,7 @@
  *======================================================================*/
 PUBLIC int kernel_main()
 {
-
+	clear();/*清屏*/
 	disp_str("-----\"kernel_main\" begins-----\n");
 
 	ticks=0;/*在sys_get_ticks()中使用*/
