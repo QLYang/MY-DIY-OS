@@ -20,6 +20,7 @@ PRIVATE	int	num_lock;	/* Num Lock	 */
 PRIVATE	int	scroll_lock;	/* Scroll Lock	 */
 PRIVATE	int	column;
 
+PRIVATE void print_scan_code();
 PRIVATE u8	get_byte_from_kbuf();
 
 /*======================================================================*
@@ -37,6 +38,7 @@ PUBLIC void keyboard_handler(int irq){
 		kb_in.count++;
 	}
 	keyboard_read();
+	/*print_scan_code();*/
 }
 /*======================================================================*
                            init_keyboard_handler
@@ -58,14 +60,10 @@ PUBLIC void init_keyboard_handler(){
 *======================================================================*/
 PUBLIC void keyboard_read()
 {
-	char	output[2];
-	memset(output, 0, 2);
 	int		make;	/* TRUE: make code;  FALSE: break code */
 	u8 		scan_code;
 
-	u32		key = 0;/* 用一个整型来表示一个键。比如，如果 Home 被按下，
-			 * 则 key 值将为定义在 keyboard.h 中的 'HOME'。
-			 */
+	u32		key = 0;/* 用一个整型来表示一个键,特殊键定义在keyboard.h*/
 	u32*	keyrow;	/* 指向 keymap[] 的某一行 */
 
 	if(kb_in.count > 0){
@@ -74,7 +72,7 @@ PUBLIC void keyboard_read()
 		scan_code = get_byte_from_kbuf();
 
 		/* 解析扫描码 */
-		if (scan_code == 0xE1) {
+		if (scan_code == 0xE1) {/*pause_brk键--连续6个字节*/
 			int i;
 			u8 pausebrk_scode[] = {0xE1, 0x1D, 0x45,
 					       0xE1, 0x9D, 0xC5};
@@ -91,7 +89,7 @@ PUBLIC void keyboard_read()
 		}
 		/*------------------------------------------------*/
 
-		else if (scan_code == 0xE0) {
+		else if (scan_code == 0xE0) {/*功能键*/
 			scan_code = get_byte_from_kbuf();
 
 			/* PrintScreen 被按下 */
@@ -170,17 +168,27 @@ PUBLIC void keyboard_read()
 
 			/* 如果 Key 不为0说明是可打印字符，否则不做处理 */
 			if (key) {
-				output[0] = key;
-				disp_str(output);
+				key |= shift_l	? FLAG_SHIFT_L	: 0;
+				key |= shift_r	? FLAG_SHIFT_R	: 0;
+				key |= ctrl_l	? FLAG_CTRL_L	: 0;
+				key |= ctrl_r	? FLAG_CTRL_R	: 0;
+				key |= alt_l	? FLAG_ALT_L	: 0;
+				key |= alt_r	? FLAG_ALT_R	: 0;
+
+				in_process(key);
 			}
 		}
 	}
 }
 
-PRIVATE u8 get_byte_from_buf(){
+/*======================================================================*
+				get_byte_from_kbuf
+ *======================================================================*/
+PRIVATE u8 get_byte_from_kbuf(){
 	u8 		scan_code;
 
 	while(kb_in.count<=0){}
+
 	disable_int();
 	scan_code = *(kb_in.p_tail);
 	kb_in.p_tail++;
@@ -191,4 +199,20 @@ PRIVATE u8 get_byte_from_buf(){
 	enable_int();
 
 	return scan_code;
+}
+
+PRIVATE void print_scan_code(){/*用于调试*/
+	u8 scan_code;
+	if (kb_in.count>0){
+		disable_int();
+
+		scan_code=*(kb_in.p_tail);
+		kb_in.p_tail++;
+		if (kb_in.p_tail == kb_in.buf + KB_IN_BYTES)
+		kb_in.p_tail = kb_in.buf;
+		kb_in.count--;
+
+		enable_int();
+	}
+	disp_int(scan_code);
 }

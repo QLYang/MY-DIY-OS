@@ -1,8 +1,8 @@
 #ifndef	_KEYBOARD_H_
 #define	_KEYBOARD_H_
 
-#define	KB_IN_BYTES	32	/*键盘输入缓冲区大小*/
-#define MAP_COLS	3	/* keymap的列 */
+#define	KB_IN_BYTES		32	/*键盘输入缓冲区大小*/
+#define MAP_COLS		3	/* keymap的列 */
 #define NR_SCAN_CODES	0x80	/* keymap的行 */
 
 #define KB_DATA		0x60	/* I/O port for keyboard data (r/w) */
@@ -16,23 +16,23 @@ typedef struct s_kb {			/*键盘输入缓冲区结构定义*/
 }KB_INPUT;
 
 /*-----------------------------------------------------------------*/
-#define FLAG_BREAK	0x0080		/* Break Code			*/
-#define FLAG_EXT	0x0100		/* Normal function keys		*/
+#define FLAG_BREAK		0x0080		/* Break Code			*/
+#define FLAG_EXT		0x0100		/* Normal function keys		*/
 #define FLAG_SHIFT_L	0x0200		/* Shift key			*/
 #define FLAG_SHIFT_R	0x0400		/* Shift key			*/
-#define FLAG_CTRL_L	0x0800		/* Control key			*/
-#define FLAG_CTRL_R	0x1000		/* Control key			*/
-#define FLAG_ALT_L	0x2000		/* Alternate key		*/
-#define FLAG_ALT_R	0x4000		/* Alternate key		*/
-#define FLAG_PAD	0x8000		/* keys in num pad		*/
+#define FLAG_CTRL_L		0x0800		/* Control key			*/
+#define FLAG_CTRL_R		0x1000		/* Control key			*/
+#define FLAG_ALT_L		0x2000		/* Alternate key		*/
+#define FLAG_ALT_R		0x4000		/* Alternate key		*/
+#define FLAG_PAD		0x8000		/* keys in num pad		*/
 
-#define MASK_RAW	0x01FF		/* raw key value = code passed to tty & MASK_RAW
+#define MASK_RAW		0x01FF		/* raw key value = code passed to tty & MASK_RAW
 					   				the value can be found either in the keymap column 0
 					   				or in the list below */
 
 /* Special keys */
-#define ESC		(0x01 + FLAG_EXT)	/* Esc		*/
-#define TAB		(0x02 + FLAG_EXT)	/* Tab		*/
+#define ESC			(0x01 + FLAG_EXT)	/* Esc		*/
+#define TAB			(0x02 + FLAG_EXT)	/* Tab		*/
 #define ENTER		(0x03 + FLAG_EXT)	/* Enter	*/
 #define BACKSPACE	(0x04 + FLAG_EXT)	/* BackSpace	*/
 
@@ -73,10 +73,10 @@ typedef struct s_kb {			/*键盘输入缓冲区结构定义*/
 #define INSERT		(0x1F + FLAG_EXT)	/* Insert	*/
 #define DELETE		(0x20 + FLAG_EXT)	/* Delete	*/
 #define HOME		(0x21 + FLAG_EXT)	/* Home		*/
-#define END		(0x22 + FLAG_EXT)	/* End		*/
+#define END			(0x22 + FLAG_EXT)	/* End		*/
 #define PAGEUP		(0x23 + FLAG_EXT)	/* Page Up	*/
 #define PAGEDOWN	(0x24 + FLAG_EXT)	/* Page Down	*/
-#define UP		(0x25 + FLAG_EXT)	/* Up		*/
+#define UP			(0x25 + FLAG_EXT)	/* Up		*/
 #define DOWN		(0x26 + FLAG_EXT)	/* Down		*/
 #define LEFT		(0x27 + FLAG_EXT)	/* Left		*/
 #define RIGHT		(0x28 + FLAG_EXT)	/* Right	*/

@@ -43,3 +43,4 @@ PUBLIC int get_ticks();
 
 /*tty.c*/
 PUBLIC void tty();
+PUBLIC void in_process(u32 key);
