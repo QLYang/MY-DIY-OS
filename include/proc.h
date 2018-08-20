@@ -25,6 +25,10 @@ typedef struct s_proc {/*保存进程相关信息*/
 
 	u16 ldt_sel;
 	DESCRIPTOR ldts[LDT_SIZE];
+
+	int ticks;		/*剩余的执行时间*/
+	int priority;
+
 	u32 pid;
 	char p_name[16];
 }PROCESS;

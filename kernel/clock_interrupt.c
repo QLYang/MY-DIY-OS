@@ -6,13 +6,14 @@
 #include "global.h"
 
 PUBLIC void clock_handler(int irq){
-	disp_str("#");
 	ticks++;
+	p_proc_ready->ticks--;
+
 	if (kernel_reenter!=0){
-		disp_str("!");
 		return;
 	}
-	p_proc_ready++;
-	if (p_proc_ready>=proc_table+NR_TASKS)
-		p_proc_ready=proc_table;
+	if (p_proc_ready->ticks>0){/*在当前进程的ticks减到0之前，其他进程没有执行机会*/
+		return;
+	}
+	schedule();
 }

@@ -621,7 +621,8 @@ ALIGN	32
 ;数据
 LABEL_DATA:
 ;---------------------------------------
-_dwMemSize:	dd 0		;Real Mode
+;Real Mode
+_dwMemSize:	dd 0
 _dwMCRNumber:	dd 0	; Memory Check Result
 _ARDStruct:
 	_dwBaseAddrLow:		dd	0
@@ -634,7 +635,8 @@ _dwDispPos:			dd	(80 * 6 + 0) * 2
 _szRAMSize:			db	"RAM size:", 0
 _return				db	"\n",0
 ;---------------------------------------
-dwMemSize		equ	BaseOfLoaderPhyAddr + _dwMemSize	;Protect Mode
+;Protect Mode
+dwMemSize		equ	BaseOfLoaderPhyAddr + _dwMemSize
 dwMCRNumber		equ	BaseOfLoaderPhyAddr + _dwMCRNumber
 ARDStruct		equ	BaseOfLoaderPhyAddr + _ARDStruct
 	dwBaseAddrLow	equ	BaseOfLoaderPhyAddr + _dwBaseAddrLow

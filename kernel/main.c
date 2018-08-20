@@ -11,6 +11,7 @@
  *======================================================================*/
 PUBLIC int kernel_main()
 {
+
 	disp_str("-----\"kernel_main\" begins-----\n");
 
 	ticks=0;/*在sys_get_ticks()中使用*/
@@ -46,6 +47,11 @@ PUBLIC int kernel_main()
 		p_task++;
 		selector_ldt += 1 << 3;
 	}
+	proc_table[0].ticks=proc_table[0].priority=15;
+	proc_table[1].ticks=proc_table[1].priority=5;
+	proc_table[2].ticks=proc_table[2].priority=3;
+
+
 	p_proc_ready	= proc_table;
 
 	put_irq_handler(CLOCK_IRQ, clock_handler); /* 设定时钟中断处理程序 */
@@ -64,7 +70,6 @@ void TestA()
 	int i = 0;
 	while(1){
 		disp_str("A");
-		disp_int(get_ticks());
 		disp_str(".");
 		delay(1);
 	}
