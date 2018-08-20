@@ -34,13 +34,13 @@ LABEL_START:			; <--- 从这里开始
 ; 下面在 A 盘的根目录寻找 KERNEL.BIN
 ;--------------------------------------
 	mov	word [wSectorNo], SectorNoOfRootDirectory
-	xor	ah, ah	; ┓
-	xor	dl, dl	; ┣ 软驱复位
-	int	13h	; ┛
+	xor	ah, ah	;
+	xor	dl, dl	; 软驱复位
+	int	13h		;
 LABEL_SEARCH_IN_ROOT_DIR_BEGIN:
-	cmp	word [wRootDirSizeForLoop], 0	; ┓
-	jz	LABEL_NO_KERNELBIN		; ┣ 判断根目录区是不是已经读完, 如果读完表示没有找到 KERNEL.BIN
-	dec	word [wRootDirSizeForLoop]	; ┛
+	cmp	word [wRootDirSizeForLoop], 0	;
+	jz	LABEL_NO_KERNELBIN				; 判断根目录区是不是已经读完, 如果读完表示没有找到 KERNEL.BIN
+	dec	word [wRootDirSizeForLoop]		;
 	mov	ax, BaseOfKernelFile
 	mov	es, ax			; es <- BaseOfKernelFile
 	mov	bx, OffsetOfKernelFile	; bx <- OffsetOfKernelFile	于是, es:bx = BaseOfKernelFile:OffsetOfKernelFile = BaseOfKernelFile * 10h + OffsetOfKernelFile
@@ -58,22 +58,22 @@ LABEL_SEARCH_FOR_KERNELBIN:
 	dec	dx					; ┛
 	mov	cx, 11
 LABEL_CMP_FILENAME:
-	cmp	cx, 0			; ┓
-	jz	LABEL_FILENAME_FOUND	; ┣ 循环次数控制, 如果比较了 11 个字符都相等, 表示找到
-	dec	cx			; ┛
-	lodsb				; ds:si -> al
-	cmp	al, byte [es:di]	; if al == es:di
+	cmp	cx, 0					;
+	jz	LABEL_FILENAME_FOUND	; 循环次数控制, 如果比较了 11 个字符都相等, 表示找到
+	dec	cx						;
+	lodsb						; ds:si -> al
+	cmp	al, byte [es:di]		; if al == es:di
 	jz	LABEL_GO_ON
 	jmp	LABEL_DIFFERENT
 LABEL_GO_ON:
 	inc	di
-	jmp	LABEL_CMP_FILENAME	;	继续循环
+	jmp	LABEL_CMP_FILENAME		;	继续循环
 
 LABEL_DIFFERENT:
-	and	di, 0FFE0h		; else┓	这时di的值不知道是什么, di &= e0 为了让它是 20h 的倍数
-	add	di, 20h			;     ┃
-	mov	si, KernelFileName	;     ┣ di += 20h  下一个目录条目
-	jmp	LABEL_SEARCH_FOR_KERNELBIN;   ┛
+	and	di, 0FFE0h				; else	这时di的值不知道是什么, di &= e0 为了让它是 20h 的倍数
+	add	di, 20h					;
+	mov	si, KernelFileName		;     di += 20h  下一个目录条目
+	jmp	LABEL_SEARCH_FOR_KERNELBIN;
 
 LABEL_GOTO_NEXT_SECTOR_IN_ROOT_DIR:
 	add	word [wSectorNo], 1
@@ -94,8 +94,8 @@ LABEL_FILENAME_FOUND:			; 找到 KERNEL.BIN 后便来到这里继续
 	and	di, 0FFF0h		; di -> 当前条目的开始
 
 	push	eax
-	mov	eax, [es : di + 01Ch]		; ┓
-	mov	dword [dwKernelSize], eax	; ┛保存 KERNEL.BIN 文件大小
+	mov	eax, [es : di + 01Ch]		;
+	mov	dword [dwKernelSize], eax	; 保存 KERNEL.BIN 文件大小
 	pop	eax
 
 	add	di, 01Ah		; di -> 首 Sector
@@ -109,14 +109,14 @@ LABEL_FILENAME_FOUND:			; 找到 KERNEL.BIN 后便来到这里继续
 	mov	ax, cx			; ax <- Sector 号
 
 LABEL_GOON_LOADING_FILE:
-	push	ax			; ┓
-	push	bx			; ┃
-	mov	ah, 0Eh			; ┃ 每读一个扇区就在 "Loading  " 后面打一个点, 形成这样的效果:
-	mov	al, '.'			; ┃
-	mov	bl, 0Fh			; ┃ Loading ......
-	int	10h			; ┃
-	pop	bx			; ┃
-	pop	ax			; ┛
+	push	ax			;
+	push	bx			;
+	mov	ah, 0Eh			; 每读一个扇区就在 "Loading  " 后面打一个点, 形成这样的效果:
+	mov	al, '.'			;
+	mov	bl, 0Fh			; Loading ......
+	int	10h				;
+	pop	bx				;
+	pop	ax				;
 
 	mov	cl, 1
 	call	ReadSector
@@ -165,12 +165,12 @@ DispStrInRealMode:
 	mov	ax, MessageLength
 	mul	dh
 	add	ax, LoadMessage
-	mov	bp, ax			; ┓
-	mov	ax, ds			; ┣ ES:BP = 串地址
-	mov	es, ax			; ┛
+	mov	bp, ax				;
+	mov	ax, ds				; ES:BP = 串地址
+	mov	es, ax				;
 	mov	cx, MessageLength	; CX = 串长度
-	mov	ax, 01301h		; AH = 13,  AL = 01h
-	mov	bx, 0007h		; 页号为0(BH = 0) 黑底白字(BL = 07h)
+	mov	ax, 01301h			; AH = 13,  AL = 01h
+	mov	bx, 0007h			; 页号为0(BH = 0) 黑底白字(BL = 07h)
 	mov	dl, 0
 	add	dh, 3
 	int	10h			; int 10h
@@ -224,9 +224,9 @@ GetFATEntry:
 	push	es
 	push	bx
 	push	ax
-	mov	ax, BaseOfKernelFile; `.
-	sub	ax, 0100h	;  | 在 BaseOfLoader 后面留出 4K 空间用于存放 FAT
-	mov	es, ax		; /
+	mov	ax, BaseOfKernelFile;
+	sub	ax, 0100h			;在 BaseOfLoader 后面留出 4K 空间用于存放 FAT
+	mov	es, ax				;
 	pop	ax
 	mov	byte [bOdd], 0
 	mov	bx, 3
@@ -359,11 +359,11 @@ MemCpy:
 	cmp	ecx, 0		; 判断计数器
 	jz	.2		; 计数器为零时跳出
 
-	mov	al, [ds:esi]		; ┓
-	inc	esi			; ┃
-					; ┣ 逐字节移动
-	mov	byte [es:edi], al	; ┃
-	inc	edi			; ┛
+	mov	al, [ds:esi]		;
+	inc	esi					;
+							; 逐字节移动
+	mov	byte [es:edi], al	;
+	inc	edi					;
 
 	dec	ecx		; 计数器减一
 	jmp	.1		; 循环
@@ -480,21 +480,21 @@ SetupPaging:
 ;--------------------------------------
 InitKernel:
         xor   esi, esi
-        mov   cx, word [BaseOfKernelFilePhyAddr+2Ch];`. ecx <- pELFHdr->e_phnum
-        movzx ecx, cx                               ;/
+        mov   cx, word [BaseOfKernelFilePhyAddr+2Ch]; ecx <- pELFHdr->e_phnum
+        movzx ecx, cx                               ;
         mov   esi, [BaseOfKernelFilePhyAddr + 1Ch]  ; esi <- pELFHdr->e_phoff
-        add   esi, BaseOfKernelFilePhyAddr;esi<-OffsetOfKernel+pELFHdr->e_phoff
+        add   esi, BaseOfKernelFilePhyAddr			;esi<-OffsetOfKernel+pELFHdr->e_phoff
 .Begin:
         mov   eax, [esi + 0]
         cmp   eax, 0                      ; PT_NULL
         jz    .NoAction
-        push  dword [esi + 010h]    ;size ;`.
-        mov   eax, [esi + 04h]            ; |
-        add   eax, BaseOfKernelFilePhyAddr; | memcpy((void*)(pPHdr->p_vaddr),
-        push  eax		    ;src  ; |      uchCode + pPHdr->p_offset,
-        push  dword [esi + 08h]     ;dst  ; |      pPHdr->p_filesz;
-        call  MemCpy                      ; |
-        add   esp, 12                     ;/
+        push  dword [esi + 010h]    ;size ;
+        mov   eax, [esi + 04h]            ;
+        add   eax, BaseOfKernelFilePhyAddr;  memcpy((void*)(pPHdr->p_vaddr),
+        push  eax		    		;src  ;       uchCode + pPHdr->p_offset,
+        push  dword [esi + 08h]     ;dst  ;       pPHdr->p_filesz;
+        call  MemCpy                      ;
+        add   esp, 12                     ;
 .NoAction:
         add   esi, 020h                   ; esi += pELFHdr->e_phentsize
         dec   ecx

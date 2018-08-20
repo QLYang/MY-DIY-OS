@@ -22,10 +22,10 @@ PUBLIC void schedule(){/*进程调度*/
 			}
 		}
 
-		if (!greatest_ticks) {
-			for (p = proc_table; p < proc_table+NR_TASKS; p++) {
-				p->ticks = p->priority;
-			}
-		}
+		/*if (!greatest_ticks) {*/
+		/*	for (p = proc_table; p < proc_table+NR_TASKS; p++) {*/
+		/*		p->ticks = p->priority;*/
+		/*	}*/
+		/*}*/
 	}
 }
