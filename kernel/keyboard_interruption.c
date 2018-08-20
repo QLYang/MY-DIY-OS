@@ -20,6 +20,8 @@ PRIVATE	int	num_lock;	/* Num Lock	 */
 PRIVATE	int	scroll_lock;	/* Scroll Lock	 */
 PRIVATE	int	column;
 
+PRIVATE u8	get_byte_from_kbuf();
+
 /*======================================================================*
                            keyboard_handler
 *======================================================================*/
@@ -67,26 +69,58 @@ PUBLIC void keyboard_read()
 	u32*	keyrow;	/* 指向 keymap[] 的某一行 */
 
 	if(kb_in.count > 0){
-		disable_int();
-		scan_code = *(kb_in.p_tail);
-		kb_in.p_tail++;
-		if (kb_in.p_tail == kb_in.buf + KB_IN_BYTES) {
-			kb_in.p_tail = kb_in.buf;
-		}
-		kb_in.count--;
-		enable_int();
+		code_with_E0 = 0;
+
+		scan_code = get_byte_from_kbuf();
 
 		/* 解析扫描码 */
 		if (scan_code == 0xE1) {
-			/* 暂时不做任何操作 */
+			int i;
+			u8 pausebrk_scode[] = {0xE1, 0x1D, 0x45,
+					       0xE1, 0x9D, 0xC5};
+			int is_pausebreak = 1;
+			for(i=1;i<6;i++){
+				if (get_byte_from_kbuf() != pausebrk_scode[i]) {
+					is_pausebreak = 0;
+					break;
+				}
+			}
+			if (is_pausebreak) {
+				key = PAUSEBREAK;
+			}
 		}
-		else if (scan_code == 0xE0) {
-			code_with_E0 = 1;
-		}
-		else {	/* 下面处理可打印字符 */
+		/*------------------------------------------------*/
 
+		else if (scan_code == 0xE0) {
+			scan_code = get_byte_from_kbuf();
+
+			/* PrintScreen 被按下 */
+			if (scan_code == 0x2A) {
+				if (get_byte_from_kbuf() == 0xE0) {
+					if (get_byte_from_kbuf() == 0x37) {
+						key = PRINTSCREEN;
+						make = 1;
+					}
+				}
+			}
+			/* PrintScreen 被释放 */
+			if (scan_code == 0xB7) {
+				if (get_byte_from_kbuf() == 0xE0) {
+					if (get_byte_from_kbuf() == 0xAA) {
+						key = PRINTSCREEN;
+						make = 0;
+					}
+				}
+			}
+			/* 不是PrintScreen, 此时scan_code为0xE0紧跟的那个值. */
+			if (key == 0) {
+				code_with_E0 = 1;
+			}
+		}
+		/*------------------------------------------------*/
+		if ((key != PAUSEBREAK) && (key != PRINTSCREEN)) {
 			/* 首先判断Make Code 还是 Break Code */
-			make = (scan_code & FLAG_BREAK ? FALSE : TRUE);
+			make = (scan_code & FLAG_BREAK ? 0 : 1);
 
 			/* 先定位到 keymap 中的行 */
 			keyrow = &keymap[(scan_code & 0x7F) * MAP_COLS];
@@ -135,11 +169,26 @@ PUBLIC void keyboard_read()
 			}
 
 			/* 如果 Key 不为0说明是可打印字符，否则不做处理 */
-			if(key){
+			if (key) {
 				output[0] = key;
 				disp_str(output);
 			}
-
 		}
 	}
+}
+
+PRIVATE u8 get_byte_from_buf(){
+	u8 		scan_code;
+
+	while(kb_in.count<=0){}
+	disable_int();
+	scan_code = *(kb_in.p_tail);
+	kb_in.p_tail++;
+	if (kb_in.p_tail == kb_in.buf + KB_IN_BYTES)
+		kb_in.p_tail = kb_in.buf;
+
+	kb_in.count--;
+	enable_int();
+
+	return scan_code;
 }
