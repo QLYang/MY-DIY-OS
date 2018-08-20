@@ -54,9 +54,8 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table;
 
-	put_irq_handler(CLOCK_IRQ, clock_handler); /* 设定时钟中断处理程序 */
-    enable_irq(CLOCK_IRQ);
-
+	init_clock_handler();/*初始化时钟中断*/
+	init_keyboard_handler();/*初始化键盘中断*/
 	restart();
 
 	while(1){}

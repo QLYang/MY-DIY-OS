@@ -9,11 +9,12 @@ src7=kernel/global.c
 src8=kernel/protect.c
 src9=lib/k_liba.c
 src10=kernel/main.c
-src11=kernel/clock_interrupt.c
+src11=kernel/clock_interruption.c
 src12=kernel/syscall.asm
 src13=kernel/proc.c
+src14=kernel/keyboard_interruption.c
 
-src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10) $(src11) $(src12) $(src13)
+src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10) $(src11) $(src12) $(src13) $(src14)
 #Target
 debug_tar1=boot.com
 debug_tar2=loader.bin
@@ -73,13 +74,14 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src8) -o protect.o
 	gcc $(gcc-flag) -c $(src9) -o k_liba.o
 	gcc $(gcc-flag) -c $(src10) -o main.o
-	gcc $(gcc-flag) -c $(src11) -o clock_interrupt.o
+	gcc $(gcc-flag) -c $(src11) -o clock_interruption.o
 	nasm $(nasm-flag) -f elf $(src12) -o syscall.o
 	gcc $(gcc-flag) -c $(src13) -o proc.o
+	gcc $(gcc-flag) -c $(src14) -o keyboard_interruption.o
 
 	ld -s -Ttext 0x30400 -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
-	global.o k_liba.o protect.o main.o clock_interrupt.o syscall.o proc.o \
-	-o $(tar3)
+	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
+	 keyboard_interruption.o -o $(tar3)
 
 	sudo mount -o loop $(img) /mnt/floppy/
 	sudo cp $(tar3) /mnt/floppy/ -v
