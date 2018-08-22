@@ -37,7 +37,7 @@ PUBLIC void keyboard_handler(int irq){
 		}
 		kb_in.count++;
 	}
-	keyboard_read();
+	/*keyboard_read();*/
 	/*print_scan_code();*/
 }
 /*======================================================================*
