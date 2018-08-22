@@ -28,10 +28,10 @@ PUBLIC void put_irq_handler(int irq, irq_handler handler);
 PUBLIC void spurious_irq(int irq);
 
 /* clock_interrupt.c */
-PUBLIC void init_clock_handler();
+PUBLIC void init_clock();
 
 /* keyboard_interrupt.c */
-PUBLIC void init_keyboard_handler();
+PUBLIC void init_keyboard();
 PUBLIC void keyboard_read();
 
 /*proc.c*/
@@ -42,5 +42,5 @@ PUBLIC void sys_call();
 PUBLIC int get_ticks();
 
 /*tty.c*/
-PUBLIC void tty();
-PUBLIC void in_process(u32 key);
+PUBLIC void task_tty();
+PUBLIC void in_process(TTY* p_tty,u32 key);

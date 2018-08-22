@@ -1,11 +1,13 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
-#include "proto.h"
 #include "proc.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
 #include "keyboard.h"
 #include "keymap.h"
+#include "proto.h"
 
 PRIVATE KB_INPUT kb_in;
 PRIVATE	int	code_with_E0 = 0;
@@ -41,9 +43,9 @@ PUBLIC void keyboard_handler(int irq){
 	/*print_scan_code();*/
 }
 /*======================================================================*
-                           init_keyboard_handler
+                           init_keyboard
 *======================================================================*/
-PUBLIC void init_keyboard_handler(){
+PUBLIC void init_keyboard(){
 	kb_in.count=0;
 	kb_in.p_head=kb_in.p_tail=kb_in.buf;
 
@@ -58,7 +60,7 @@ PUBLIC void init_keyboard_handler(){
 /*======================================================================*
                            keyboard_read
 *======================================================================*/
-PUBLIC void keyboard_read()
+PUBLIC void keyboard_read(TTY* p_tty)
 {
 	int		make;	/* TRUE: make code;  FALSE: break code */
 	u8 		scan_code;
@@ -175,7 +177,7 @@ PUBLIC void keyboard_read()
 				key |= alt_l	? FLAG_ALT_L	: 0;
 				key |= alt_r	? FLAG_ALT_R	: 0;
 
-				in_process(key);
+				in_process(p_tty,key);
 			}
 		}
 	}

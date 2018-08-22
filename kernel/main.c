@@ -1,9 +1,11 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
-#include "proto.h"
 #include "proc.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
+#include "proto.h"
 
 
 /*======================================================================*
@@ -54,8 +56,8 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table;
 
-	init_clock_handler();/*初始化时钟中断*/
-	init_keyboard_handler();/*初始化键盘中断*/
+	init_clock();/*初始化时钟中断*/
+	init_keyboard();/*初始化键盘中断*/
 	restart();
 
 	while(1){}
