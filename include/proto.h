@@ -48,3 +48,4 @@ PUBLIC void in_process(TTY* p_tty,u32 key);
 PUBLIC void init_screen(TTY* p_tty);
 PUBLIC void select_console(int nr_console);
 PUBLIC void out_char(CONSOLE* p_con, char ch);
+PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
