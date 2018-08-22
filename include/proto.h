@@ -44,3 +44,7 @@ PUBLIC int get_ticks();
 /*tty.c*/
 PUBLIC void task_tty();
 PUBLIC void in_process(TTY* p_tty,u32 key);
+/*console.c*/
+PUBLIC void init_screen(TTY* p_tty);
+PUBLIC void select_console(int nr_console);
+PUBLIC void out_char(CONSOLE* p_con, char ch);
