@@ -15,7 +15,10 @@ EXTERN	PROCESS*	p_proc_ready;
 
 extern	PROCESS		proc_table[];
 extern	char		task_stack[];
+
 extern	TASK		task_table[];
+extern  TASK        user_proc_table[];
+
 EXTERN  u32 kernel_reenter;
 extern	irq_handler		irq_table[];
 
