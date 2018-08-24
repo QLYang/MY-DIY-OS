@@ -37,15 +37,22 @@ PUBLIC void keyboard_read();
 /*proc.c*/
 PUBLIC int sys_get_ticks();
 PUBLIC void sys_call();
+PUBLIC int sys_write(char* buf, int len, PROCESS* p_proc);
 
 /*syscall.asm*/
 PUBLIC int get_ticks();
-
+PUBLIC void write(char* buf, int len);
 /*tty.c*/
 PUBLIC void task_tty();
 PUBLIC void in_process(TTY* p_tty,u32 key);
+PUBLIC void tty_write(TTY* p_tty, char* buf, int len);
+PUBLIC int sys_write(char* buf, int len, PROCESS* p_proc);
 /*console.c*/
 PUBLIC void init_screen(TTY* p_tty);
 PUBLIC void select_console(int nr_console);
 PUBLIC void out_char(CONSOLE* p_con, char ch);
 PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
+/* printf.c */
+PUBLIC  int     printf(const char *fmt, ...);
+/* vsprintf.c */
+PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);

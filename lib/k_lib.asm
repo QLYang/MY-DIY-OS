@@ -17,6 +17,7 @@ global 	out_byte
 global	in_byte
 global	memset
 global	strcpy
+global	strlen
 global  enable_irq
 global  disable_irq
 
@@ -293,3 +294,24 @@ enable_int:
 disable_int:
 		cli
 		ret
+
+; ========================================================================
+; 					int strlen(char* p_str);
+;  ========================================================================
+strlen:
+        push    ebp
+        mov     ebp, esp
+
+        mov     eax, 0                  ; 字符串长度开始是 0
+        mov     esi, [ebp + 8]          ; esi 指向首地址
+
+.1:
+        cmp     byte [esi], 0           ; 看 esi 指向的字符是否是 '\0'
+        jz      .2                      ; 如果是 '\0'，程序结束
+        inc     esi                     ; 如果不是 '\0'，esi 指向下一个字符
+        inc     eax                     ; 并且，eax 加一
+        jmp     .1                      ;
+
+.2:
+        pop     ebp
+        ret

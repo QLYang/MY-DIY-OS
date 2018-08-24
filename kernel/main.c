@@ -15,7 +15,6 @@ PUBLIC int kernel_main()
 {
 	clear();/*清屏*/
 	disp_str("-----\"kernel_main\" begins-----\n");
-
 	TASK*		p_task= task_table;
 	PROCESS*	p_proc= proc_table;
 	char*		p_task_stack= task_stack + STACK_SIZE_TOTAL;
@@ -60,15 +59,24 @@ PUBLIC int kernel_main()
 		p_proc->regs.esp = (u32)p_task_stack;
 		p_proc->regs.eflags = eflags;
 
+		p_proc->nr_tty = 0;
+
 		p_task_stack -= p_task->stacksize;
 		p_proc++;
 		p_task++;
 		selector_ldt += 1 << 3;
 	}
-	proc_table[0].ticks=proc_table[0].priority=15;
-	proc_table[1].ticks=proc_table[1].priority=5;
-	proc_table[2].ticks=proc_table[2].priority=3;
-	proc_table[3].ticks=proc_table[3].priority=1;
+	proc_table[0].ticks=proc_table[0].priority=15;/*tty_task*/
+	proc_table[1].ticks=proc_table[1].priority=5;/*task_x*/
+	proc_table[2].ticks=proc_table[2].priority=5;
+	proc_table[3].ticks=proc_table[3].priority=5;
+
+	proc_table[1].nr_tty = 0;/*task_x*/
+    proc_table[2].nr_tty = 1;
+    proc_table[3].nr_tty = 1;
+
+	kernel_reenter = 0;
+	ticks = 0;
 
 	p_proc_ready= proc_table;
 
@@ -84,11 +92,11 @@ PUBLIC int kernel_main()
  *======================================================================*/
 void TestA()
 {
-	int i = 0;
 	while(1){
-		/*disp_str("A");
-		disp_str(".");
-		delay(1);*/
+		int i = 0;
+		printf("<Ticks:%x>", get_ticks());
+		delay(1);
+
 	}
 }
 /*======================================================================*
@@ -96,11 +104,10 @@ void TestA()
  *======================================================================*/
 void TestB()
 {
-	int i = 0;
 	while(1){
-		/*disp_str("B");
-		disp_str(".");
-		delay(1);*/
+		int i = 0x1000;
+		printf("B");
+		delay(1);
 	}
 }
 /*======================================================================*
@@ -108,10 +115,8 @@ void TestB()
  *======================================================================*/
 void TestC()
 {
-	int i = 0;
 	while(1){
-		/*disp_str("C");
-		disp_str(".");
-		delay(1);*/
+		printf("C");
+		delay(1);
 	}
 }

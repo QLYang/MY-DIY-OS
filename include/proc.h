@@ -31,6 +31,8 @@ typedef struct s_proc {/*保存进程相关信息*/
 
 	u32 pid;
 	char p_name[16];
+
+	int nr_tty;
 }PROCESS;
 
 typedef struct s_task {

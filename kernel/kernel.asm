@@ -301,12 +301,15 @@ restart_reenter:
 ;			sys_call
 ;======================================
 sys_call:
-	call save
-	sti
+    call    save
+	push	dword [p_proc_ready]
+    sti
 
-	call [sys_call_table+eax*4]
-	mov	[esi+EAXREG],eax			;return
+	push	ecx
+	push	ebx
+    call    [sys_call_table + eax * 4]
+	add	esp, 4 * 3
 
-	cli
-
-	ret
+    mov     [esi + EAXREG ], eax
+    cli
+    ret

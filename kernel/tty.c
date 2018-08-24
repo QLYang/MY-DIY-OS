@@ -29,7 +29,6 @@ PUBLIC void task_tty()
 	for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
 		init_tty(p_tty);
 	}
-	nr_current_console = 0;
 	select_console(0);
 	while (1) {
 		for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
@@ -161,4 +160,27 @@ PRIVATE void put_key(TTY* p_tty, u32 key)
 		}
 		p_tty->inbuf_count++;
 	}
+}
+
+/*======================================================================*
+                              tty_write
+*======================================================================*/
+PUBLIC void tty_write(TTY* p_tty, char* buf, int len)/*将buf中的字符写入对应console*/
+{
+        char* p = buf;
+        int i = len;
+
+        while (i) {
+                out_char(p_tty->p_console, *p++);
+                i--;
+        }
+}
+
+/*======================================================================*
+                              sys_write
+*======================================================================*/
+PUBLIC int sys_write(char* buf, int len, PROCESS* p_proc)/*系统调用*/
+{
+        tty_write(&tty_table[p_proc->nr_tty], buf, len);
+        return 0;
 }

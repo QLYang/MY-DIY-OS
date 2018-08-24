@@ -42,7 +42,7 @@
 #define	AT_WINI_IRQ	14	/* at winchester */
 
 /*系统调用*/
-#define	NR_SYS_CALL	1	/* at winchester */
+#define	NR_SYS_CALL	2
 
 #define TRUE 1
 #define FALSE 0
