@@ -18,18 +18,19 @@ PUBLIC void schedule(){/*进程调度*/
 	int	 greatest_ticks = 0;
 
 	while (!greatest_ticks) {
-		for (p = proc_table; p < proc_table+NR_TASKS+NR_PROCS; p++) {
-			if (p->ticks > greatest_ticks) {
-				greatest_ticks = p->ticks;
-				p_proc_ready = p;
+		for (p = &FIRST_PROC; p <= &LAST_PROC; p++) {
+			if (p->p_flags == 0) {
+				if (p->ticks > greatest_ticks) {
+					greatest_ticks = p->ticks;
+					p_proc_ready = p;
+				}
 			}
 		}
 
-		if (!greatest_ticks) {
-			for (p = proc_table; p < proc_table+NR_TASKS+NR_PROCS; p++) {
-				p->ticks = p->priority;
-			}
-		}
+		if (!greatest_ticks)
+			for (p = &FIRST_PROC; p <= &LAST_PROC; p++)
+				if (p->p_flags == 0)
+					p->ticks = p->priority;
 	}
 }
 

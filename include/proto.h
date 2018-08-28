@@ -24,7 +24,10 @@ void restart();
 void TestA();
 void TestB();
 void TestC();
+PUBLIC int get_ticks();
 PUBLIC void panic(const char *fmt, ...);
+/*systask.c*/
+PUBLIC void task_sys();
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);
 PUBLIC void spurious_irq(int irq);

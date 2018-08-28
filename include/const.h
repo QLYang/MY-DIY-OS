@@ -95,6 +95,9 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define NO_TASK		(NR_TASKS + NR_PROCS + 20)
 
 #define INTERRUPT	-10
+
+#define TASK_TTY	0
+#define TASK_SYS	1
 /* Process */
 #define SENDING   0x02	/* set when proc trying to send */
 #define RECEIVING 0x04	/* set when proc trying to recv */
@@ -109,5 +112,7 @@ enum msgtype {
 	/* SYS task */
 	GET_TICKS,
 };
+
+#define	RETVAL		u.m3.m3i1
 
 #endif
