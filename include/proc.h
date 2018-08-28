@@ -20,7 +20,7 @@ typedef struct s_stackframe {/*一系列寄存器的值组成一个栈帧*/
 }STACK_FRAME;
 
 
-typedef struct s_proc {/*保存进程相关信息*/
+typedef struct proc {/*保存进程相关信息*/
 	STACK_FRAME regs;
 
 	u16 ldt_sel;
@@ -30,20 +30,33 @@ typedef struct s_proc {/*保存进程相关信息*/
 	int priority;
 
 	u32 pid;
-	char p_name[16];
+	char name[16];
+
+	int  p_flags;
+	MESSAGE * p_msg;
+	int p_recvfrom;
+	int p_sendto;
+	int has_int_msg;
+	struct proc * q_sending;
+	struct proc * next_sending;
 
 	int nr_tty;
 }PROCESS;
 
-typedef struct s_task {
+typedef struct task {
 	task_f	initial_eip;
 	int	stacksize;
 	char	name[32];
 }TASK;
 
+#define proc2pid(x) (x - proc_table)
+
 /* Number of tasks and procs*/
 #define NR_TASKS	1
 #define NR_PROCS	3
+
+#define FIRST_PROC	proc_table[0]
+#define LAST_PROC	proc_table[NR_TASKS + NR_PROCS - 1]
 /* stacks of tasks */
 #define STACK_SIZE_TESTA	0x8000
 #define STACK_SIZE_TESTB	0x8000

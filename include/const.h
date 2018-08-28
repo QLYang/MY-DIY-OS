@@ -6,6 +6,8 @@
 #define	PUBLIC
 #define	PRIVATE	static
 
+#define	STR_DEFAULT_LEN	1024
+
 /* EXTERN is defined as extern except in global.c */
 #define EXTERN extern
 
@@ -48,6 +50,15 @@
 #define FALSE 0
 
 /*显示--相关宏*/
+/* Color */
+#define BLACK   0x0     /* 0000 */
+#define WHITE   0x7     /* 0111 */
+#define RED     0x4     /* 0100 */
+#define GREEN   0x2     /* 0010 */
+#define BLUE    0x1     /* 0001 */
+#define FLASH   0x80    /* 1000 0000 */
+#define BRIGHT  0x08    /* 0000 1000 */
+#define	MAKE_COLOR(x,y)	((x<<4) | y) /* MAKE_COLOR(Background,Foreground) */
 /* VGA */
 #define	CRTC_ADDR_REG	0x3D4	/* CRT Controller Registers - Addr Register */
 #define	CRTC_DATA_REG	0x3D5	/* CRT Controller Registers - Data Register */
@@ -60,5 +71,43 @@
 
 /* TTY */
 #define NR_CONSOLES	3	/* consoles */
+
+/*assert*/
+#define ASSERT
+#ifdef ASSERT
+void assertion_failure(char *exp, char *file, char *base_file, int line);
+#define assert(exp)  if (exp) ; \
+        else assertion_failure(#exp, __FILE__, __BASE_FILE__, __LINE__)
+#else
+#define assert(exp)
+#endif
+
+/* magic chars used by `printx' */
+#define MAG_CH_PANIC	'\002'
+#define MAG_CH_ASSERT	'\003'
+
+/* ipc */
+#define SEND		1
+#define RECEIVE		2
+#define BOTH		3	/* BOTH = (SEND | RECEIVE) */
+/* tasks */
+#define ANY		(NR_TASKS + NR_PROCS + 10)
+#define NO_TASK		(NR_TASKS + NR_PROCS + 20)
+
+#define INTERRUPT	-10
+/* Process */
+#define SENDING   0x02	/* set when proc trying to send */
+#define RECEIVING 0x04	/* set when proc trying to recv */
+
+enum msgtype {
+	/*
+	 * when hard interrupt occurs, a msg (with type==HARD_INT) will
+	 * be sent to some tasks
+	 */
+	HARD_INT = 1,
+
+	/* SYS task */
+	GET_TICKS,
+};
 
 #endif

@@ -37,7 +37,7 @@ PUBLIC int kernel_main()
             eflags    = 0x202; /* IF=1, bit 2 is always 1 */
             }
 
-		strcpy(p_proc->p_name, p_task->name);	// name of the process
+		strcpy(p_proc->name, p_task->name);	// name of the process
 		p_proc->pid = i;			// pid
 
 		p_proc->ldt_sel = selector_ldt;
@@ -94,7 +94,7 @@ void TestA()
 {
 	while(1){
 		int i = 0;
-		printf("<Ticks:%x>", get_ticks());
+		printf("A");
 		delay(1);
 
 	}
@@ -119,4 +119,22 @@ void TestC()
 		printf("C");
 		delay(1);
 	}
+}
+
+/*======================================================================*
+                                panic
+ *======================================================================*/
+PUBLIC void panic(const char *fmt, ...)
+{
+	int i;
+	char buf[256];
+
+	va_list arg = (va_list)((char*)&fmt + 4);
+
+	i = vsprintf(buf, fmt, arg);
+
+	printl("%c !!panic!! %s", MAG_CH_PANIC, buf);
+
+	/* should never arrive here */
+	__asm__ __volatile__("ud2");
 }

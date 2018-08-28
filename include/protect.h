@@ -2,7 +2,7 @@
 #define _PROTECT_H_
 
 /* 存储段描述符/系统段描述符 */
-typedef struct s_descriptor		/* 共 8 个字节 */
+typedef struct descriptor		/* 共 8 个字节 */
 {
 	u16	limit_low;		/* Limit */
 	u16	base_low;		/* Base */
@@ -135,6 +135,9 @@ typedef struct s_tss {
 
 /* 每个任务有一个单独的 LDT, 每个 LDT 中的描述符个数: */
 #define LDT_SIZE		2
+
+#define INDEX_LDT_C             0
+#define INDEX_LDT_RW            1
 
 /* 线性地址 → 物理地址 */
 #define vir2phys(seg_base, vir)	(u32)(((u32)seg_base) + (u32)(vir))

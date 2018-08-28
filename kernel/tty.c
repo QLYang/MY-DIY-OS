@@ -177,10 +177,51 @@ PUBLIC void tty_write(TTY* p_tty, char* buf, int len)/*将buf中的字符写入�
 }
 
 /*======================================================================*
-                              sys_write
+                              sys_printx
 *======================================================================*/
-PUBLIC int sys_write(char* buf, int len, PROCESS* p_proc)/*系统调用*/
+PUBLIC int sys_printx(int _unused1, int _unused2, char* s, struct proc* p_proc)
 {
-        tty_write(&tty_table[p_proc->nr_tty], buf, len);
-        return 0;
+	const char * p;
+	char ch;
+
+	char reenter_err[] = "? k_reenter is incorrect for unknown reason";
+	reenter_err[0] = MAG_CH_PANIC;
+
+	if (kernel_reenter == 0)  /* printx() called in Ring<1~3> */
+		p = va2la(proc2pid(p_proc), s);
+	else if (kernel_reenter > 0) /* printx() called in Ring<0> */
+		p = s;
+	else	/* this should NOT happen */
+		p = reenter_err;
+
+	if ((*p == MAG_CH_PANIC) ||
+	    (*p == MAG_CH_ASSERT && p_proc_ready < &proc_table[NR_TASKS])) {
+		disable_int();
+		char * v = (char*)V_MEM_BASE;
+		const char * q = p + 1; /* +1: skip the magic char */
+
+		while (v < (char*)(V_MEM_BASE + V_MEM_SIZE)) {
+			*v++ = *q++;
+			*v++ = RED_CHAR;
+			if (!*q) {
+				while (((int)v - V_MEM_BASE) % (SCR_WIDTH * 16)) {
+					/* *v++ = ' '; */
+					v++;
+					*v++ = GRAY_CHAR;
+				}
+				q = p + 1;
+			}
+		}
+
+		__asm__ __volatile__("hlt");
+	}
+
+	while ((ch = *p++) != 0) {
+		if (ch == MAG_CH_PANIC || ch == MAG_CH_ASSERT)
+			continue; /* skip the magic char */
+
+		out_char(tty_table[p_proc->nr_tty].p_console, ch);
+	}
+
+	return 0;
 }

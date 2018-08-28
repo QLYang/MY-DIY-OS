@@ -263,9 +263,13 @@ save:
         push    es      ;  | 保存原寄存器值
         push    fs      ;  |
         push    gs      ; /
+
+        mov 	esi,edx
         mov     dx, ss
         mov     ds, dx
         mov     es, dx
+
+		mov 	edx,esi
 
         mov     esi, esp                    ;eax = 进程表起始地址
 
@@ -302,14 +306,17 @@ restart_reenter:
 ;======================================
 sys_call:
     call    save
-	push	dword [p_proc_ready]
     sti
+    push 	esi
 
+	push	dword [p_proc_ready]
+	push	edx
 	push	ecx
 	push	ebx
     call    [sys_call_table + eax * 4]
-	add	esp, 4 * 3
+	add	esp, 4 * 4
 
+	pop		esi
     mov     [esi + EAXREG ], eax
     cli
     ret
