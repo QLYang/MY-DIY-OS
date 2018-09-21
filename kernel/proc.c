@@ -477,3 +477,31 @@ PUBLIC void dump_msg(const char * title, MESSAGE* m)
 	       packed ? "" : "\n"/* , */
 		);
 }
+
+/*****************************************************************************
+ *                                inform_int  <Ring 0>
+ *****************************************************************************/
+PUBLIC void inform_int(int task_nr)
+{
+	struct proc* p = proc_table + task_nr;
+
+	if ((p->p_flags & RECEIVING) && /* dest is waiting for the msg */
+	    ((p->p_recvfrom == INTERRUPT) || (p->p_recvfrom == ANY))) {
+		p->p_msg->source = INTERRUPT;
+		p->p_msg->type = HARD_INT;
+		p->p_msg = 0;
+		p->has_int_msg = 0;
+		p->p_flags &= ~RECEIVING; /* dest has received the msg */
+		p->p_recvfrom = NO_TASK;
+		assert(p->p_flags == 0);
+		unblock(p);
+
+		assert(p->p_flags == 0);
+		assert(p->p_msg == 0);
+		assert(p->p_recvfrom == NO_TASK);
+		assert(p->p_sendto == NO_TASK);
+	}
+	else {
+		p->has_int_msg = 1;
+	}
+}

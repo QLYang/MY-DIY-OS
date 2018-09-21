@@ -46,7 +46,7 @@ PUBLIC	void	reset_msg(MESSAGE* p);
 PUBLIC	void	dump_msg(const char * title, MESSAGE* m);
 PUBLIC	void	dump_proc(struct proc * p);
 PUBLIC	int		send_recv(int function, int src_dest, MESSAGE* msg);
-
+PUBLIC void 	inform_int(int task_nr);
 /*syscall.asm*/
 PUBLIC int get_ticks();
 PUBLIC void write(char* buf, int len);
@@ -69,8 +69,6 @@ PUBLIC	int	sprintf(char *buf, const char *fmt, ...);
 PUBLIC void spin(char * func_name);
 
 
-
-
 /* 系统调用 - 系统级 */
 /* proc.c */
 PUBLIC	int	sys_sendrec(int function, int src_dest, MESSAGE* m, struct proc* p);
@@ -82,3 +80,9 @@ PUBLIC  void    sys_call();             /* int_handler */
 /* 系统调用 - 用户级 */
 PUBLIC	int	sendrec(int function, int src_dest, MESSAGE* p_msg);
 PUBLIC	int	printx(char* str);
+
+/*hd.c*/
+PUBLIC void	task_hd();
+PUBLIC void hd_handler(int irq);
+/* fs/main.c */
+PUBLIC void task_fs();

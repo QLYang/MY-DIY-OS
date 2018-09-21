@@ -98,6 +98,8 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 
 #define TASK_TTY	0
 #define TASK_SYS	1
+#define TASK_HD		2
+#define TASK_FS		3
 /* Process */
 #define SENDING   0x02	/* set when proc trying to send */
 #define RECEIVING 0x04	/* set when proc trying to recv */
@@ -111,8 +113,19 @@ enum msgtype {
 
 	/* SYS task */
 	GET_TICKS,
+
+	/* message type for drivers */
+	DEV_OPEN = 1001,
 };
 
+/* 8253/8254 PIT (Programmable Interval Timer) */
+#define HZ             100  /* clock freq (software settable on IBM-PC) */
+
 #define	RETVAL		u.m3.m3i1
+
+/* Hard Drive */
+#define SECTOR_SIZE		512
+#define SECTOR_BITS		(SECTOR_SIZE * 8)
+#define SECTOR_SIZE_SHIFT	9
 
 #endif

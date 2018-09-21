@@ -19,6 +19,8 @@ src17=kernel/printf.c
 src18=kernel/vsprintf.c
 src19=lib/misc.c
 src20=kernel/systask.c
+src21=kernel/hd.c
+src22=fs/main.c
 
 src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10) $(src11) $(src12) $(src13) $(src14) \
 	$(src15) $(src16) $(src17) $(src18) $(src19) $(src20)
@@ -38,26 +40,12 @@ tar= $(tar1) $(tar2) $(tar3)
 #Floppy
 img=a.img
 #Command
-.PHONY:all debug evething clean
+.PHONY:all evething clean
 
 all:evething clean
 
 clean:
 	sudo rm -f *.bin *.o
-
-debug:$(src)
-	#boot.asm
-	nasm $(src1) -o $(debug_tar1)
-	sudo mount -o loop $(img) /mnt/floppy/
-	sudo cp $(debug_tar1) /mnt/floppy/ -v
-	sudo umount /mnt/floppy/
-	#loader
-	nasm $(src2) -o $(debug_tar2)
-	sudo mount -o loop $(img) /mnt/floppy/
-	sudo cp $(debug_tar2) /mnt/floppy/ -v
-	sudo umount /mnt/floppy/
-	#clean
-	sudo rm -f $(debug_tar)
 
 #must add ';' before define! Change bochsrc
 evething:$(src)
@@ -91,11 +79,13 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src18) -o vsprintf.o
 	gcc $(gcc-flag) -c $(src19) -o misc.o
 	gcc $(gcc-flag) -c $(src20) -o systask.o
+	gcc $(gcc-flag) -c $(src21) -o hd.o
+	gcc $(gcc-flag) -c $(src22) -o fs_main.o
 
 	ld -s -Ttext 0x30400 -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
 	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
 	 keyboard_interruption.o tty.o  console.o printf.o vsprintf.o misc.o \
-	 systask.o -o $(tar3)
+	 systask.o hd.o fs_main.o -o $(tar3)
 
 	sudo mount -o loop $(img) /mnt/floppy/
 	sudo cp $(tar3) /mnt/floppy/ -v

@@ -13,7 +13,7 @@
  *======================================================================*/
 PUBLIC int kernel_main()
 {
-	clear();/*清屏*/
+	clear();
 	disp_str("-----\"kernel_main\" begins-----\n");
 	TASK*		p_task= task_table;
 	PROCESS*	p_proc= proc_table;
@@ -102,7 +102,7 @@ void TestA()
 {
 	while(1){
 		int i = 0;
-		printf("<Tick:%d>",get_ticks());
+		//printf("<Tick:%d>",get_ticks());
 		delay(1);
 
 	}
@@ -114,7 +114,7 @@ void TestB()
 {
 	while(1){
 		int i = 0x1000;
-		printf("B");
+		//printf("B");
 		delay(1);
 	}
 }
@@ -124,7 +124,7 @@ void TestB()
 void TestC()
 {
 	while(1){
-		printf("C");
+		//printf("C");
 		delay(1);
 	}
 }
