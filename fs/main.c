@@ -1,5 +1,5 @@
 #include "type.h"
-//#include "config.h"
+#include "config.h"
 #include "const.h"
 #include "protect.h"
 #include "fs.h"
@@ -21,7 +21,12 @@ PUBLIC void task_fs()
 	/* open the device: hard disk */
 	MESSAGE driver_msg;
 	driver_msg.type = DEV_OPEN;
+	driver_msg.DEVICE = MINOR(ROOT_DEV);
 	send_recv(BOTH, TASK_HD, &driver_msg);
+
+	assert(dd_map[MAJOR(ROOT_DEV)].driver_nr != INVALID_DRIVER);
+
+	send_recv(BOTH, dd_map[MAJOR(ROOT_DEV)].driver_nr, &driver_msg);
 
 	spin("FS");
 }

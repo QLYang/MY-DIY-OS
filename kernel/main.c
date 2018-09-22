@@ -4,6 +4,8 @@
 #include "proc.h"
 #include "tty.h"
 #include "console.h"
+#include "hd.h"
+#include "fs.h"
 #include "global.h"
 #include "proto.h"
 
@@ -13,7 +15,7 @@
  *======================================================================*/
 PUBLIC int kernel_main()
 {
-	clear();
+	//clear();
 	disp_str("-----\"kernel_main\" begins-----\n");
 	TASK*		p_task= task_table;
 	PROCESS*	p_proc= proc_table;

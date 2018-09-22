@@ -1,7 +1,6 @@
 #ifndef	_CONST_H_
 #define	_CONST_H_
 
-
 /* 函数类型 */
 #define	PUBLIC
 #define	PRIVATE	static
@@ -96,6 +95,7 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 
 #define INTERRUPT	-10
 
+#define INVALID_DRIVER	-20
 #define TASK_TTY	0
 #define TASK_SYS	1
 #define TASK_HD		2
@@ -121,11 +121,49 @@ enum msgtype {
 /* 8253/8254 PIT (Programmable Interval Timer) */
 #define HZ             100  /* clock freq (software settable on IBM-PC) */
 
+/*message*/
 #define	RETVAL		u.m3.m3i1
+#define	DEVICE		u.m3.m3i4
 
 /* Hard Drive */
 #define SECTOR_SIZE		512
 #define SECTOR_BITS		(SECTOR_SIZE * 8)
 #define SECTOR_SIZE_SHIFT	9
 
+#define	MAX_DRIVES		2
+#define	NR_PART_PER_DRIVE	4
+#define	NR_SUB_PER_PART		16
+#define	NR_SUB_PER_DRIVE	(NR_SUB_PER_PART * NR_PART_PER_DRIVE)
+#define	NR_PRIM_PER_DRIVE	(NR_PART_PER_DRIVE + 1)
+
+#define	MAX_PRIM		(MAX_DRIVES * NR_PRIM_PER_DRIVE - 1)
+#define	MAX_SUBPARTITIONS	(NR_SUB_PER_DRIVE * MAX_DRIVES)
+
+/* major device numbers (corresponding to kernel/global.c::dd_map[]) */
+#define	NO_DEV			0
+#define	DEV_FLOPPY		1
+#define	DEV_CDROM		2
+#define	DEV_HD			3
+#define	DEV_CHAR_TTY		4
+#define	DEV_SCSI		5
+
+/* make device number from major and minor numbers */
+#define	MAJOR_SHIFT		8
+#define	MAKE_DEV(a,b)		((a << MAJOR_SHIFT) | b)
+/* separate major and minor numbers from device number */
+#define	MAJOR(x)		((x >> MAJOR_SHIFT) & 0xFF)
+#define	MINOR(x)		(x & 0xFF)
+
+/* device numbers of hard disk */
+#define	MINOR_hd1a		0x10
+#define	MINOR_hd2a		(MINOR_hd1a+NR_SUB_PER_PART)
+
+#define	ROOT_DEV		MAKE_DEV(DEV_HD, MINOR_BOOT)
+
+#define	P_PRIMARY	0
+#define	P_EXTENDED	1
+
+#define our_PART	0x99	/* Orange'S partition */
+#define NO_PART		0x00	/* unused entry */
+#define EXT_PART	0x05	/* extended partition */
 #endif
