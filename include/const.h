@@ -10,6 +10,10 @@
 /* EXTERN is defined as extern except in global.c */
 #define EXTERN extern
 
+/* max() & min() */
+#define	max(a,b)	((a) > (b) ? (a) : (b))
+#define	min(a,b)	((a) < (b) ? (a) : (b))
+
 /* GDT 和 IDT 中描述符的个数 */
 #define	GDT_SIZE	128
 #define	IDT_SIZE	256
@@ -116,6 +120,10 @@ enum msgtype {
 
 	/* message type for drivers */
 	DEV_OPEN = 1001,
+	DEV_CLOSE,
+	DEV_READ,
+	DEV_WRITE,
+	DEV_IOCTL
 };
 
 /* 8253/8254 PIT (Programmable Interval Timer) */
@@ -124,6 +132,13 @@ enum msgtype {
 /*message*/
 #define	RETVAL		u.m3.m3i1
 #define	DEVICE		u.m3.m3i4
+#define	POSITION	u.m3.m3l1
+#define	CNT			u.m3.m3i2
+#define	PROC_NR		u.m3.m3i3
+#define	BUF		u.m3.m3p2
+#define	REQUEST		u.m3.m3i2
+/*hd_ioctl p->REQUEST*/
+#define	DIOCTL_GET_GEO	1
 
 /* Hard Drive */
 #define SECTOR_SIZE		512
@@ -163,7 +178,7 @@ enum msgtype {
 #define	P_PRIMARY	0
 #define	P_EXTENDED	1
 
-#define our_PART	0x99	/* Orange'S partition */
+#define our_PART	0x99	/* Our partition */
 #define NO_PART		0x00	/* unused entry */
 #define EXT_PART	0x05	/* extended partition */
 #endif
