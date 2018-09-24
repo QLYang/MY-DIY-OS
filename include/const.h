@@ -159,7 +159,7 @@ enum msgtype {
 #define	DEV_FLOPPY		1
 #define	DEV_CDROM		2
 #define	DEV_HD			3
-#define	DEV_CHAR_TTY		4
+#define	DEV_CHAR_TTY	4
 #define	DEV_SCSI		5
 
 /* make device number from major and minor numbers */
@@ -181,4 +181,21 @@ enum msgtype {
 #define our_PART	0x99	/* Our partition */
 #define NO_PART		0x00	/* unused entry */
 #define EXT_PART	0x05	/* extended partition */
+
+/*inode*/
+#define	INVALID_INODE		0
+#define	ROOT_INODE		1
+
+/* INODE::i_mode (octal, lower 12 bits reserved) */
+#define I_TYPE_MASK     0170000
+#define I_REGULAR       0100000
+#define I_BLOCK_SPECIAL 0060000
+#define I_DIRECTORY     0040000
+#define I_CHAR_SPECIAL  0020000
+#define I_NAMED_PIPE	0010000
+
+#define	is_special(m)	((((m) & I_TYPE_MASK) == I_BLOCK_SPECIAL) ||	\
+			 (((m) & I_TYPE_MASK) == I_CHAR_SPECIAL))
+
+#define	NR_DEFAULT_FILE_SECTS	2048 /* 2048 * 512 = 1MB */
 #endif

@@ -31,7 +31,7 @@
 #define REG_ALT_STATUS	REG_DEV_CTRL	/*	Alternate Status			I		*/
 
 #define REG_DRV_ADDR	0x3F7			/*	Drive Address				I		*/
-
+/*structure of hd command register*/
 struct hd_cmd {
 	u8	features;
 	u8	count;
@@ -41,7 +41,7 @@ struct hd_cmd {
 	u8	device;
 	u8	command;
 };
-
+/*structure of part information*/
 struct part_info {
 	u32	base;	/* # of start sector (NOT byte offset, but SECTOR) */
 	u32	size;	/* how many sectors in this partition */
@@ -60,7 +60,7 @@ struct hd_info
 	struct part_info	primary[NR_PRIM_PER_DRIVE];
 	struct part_info	logical[NR_SUB_PER_DRIVE];
 };
-
+/*structure of partition entry*/
 struct part_ent {
 	u8 boot_ind;		/**
 				 * boot indicator
@@ -128,6 +128,7 @@ struct part_ent {
 				 */
 
 } PARTITION_ENTRY;
+
 /***************/
 /* DEFINITIONS */
 /***************/

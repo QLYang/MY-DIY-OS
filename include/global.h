@@ -31,4 +31,6 @@ extern  CONSOLE         console_table[];
 EXTERN	int			nr_current_console;
 
 /* FS */
-extern	struct dev_drv_map	dd_map[];
+extern	struct 			dev_drv_map	dd_map[];
+extern	const int		FSBUF_SIZE;
+extern	u8 *			fsbuf;
