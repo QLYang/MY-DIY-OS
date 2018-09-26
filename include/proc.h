@@ -31,7 +31,7 @@ typedef struct proc {/*保存进程相关信息*/
 
 	u32 pid;
 	char name[16];
-
+	/*msg*/
 	int  p_flags;
 	MESSAGE * p_msg;
 	int p_recvfrom;
@@ -39,8 +39,10 @@ typedef struct proc {/*保存进程相关信息*/
 	int has_int_msg;
 	struct proc * q_sending;
 	struct proc * next_sending;
-
+	/*tty-console*/
 	int nr_tty;
+	/*file descriptor*/
+	struct file_desc * filp[NR_FILES];
 }PROCESS;
 
 typedef struct task {

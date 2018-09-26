@@ -102,12 +102,10 @@ PUBLIC int kernel_main()
  *======================================================================*/
 void TestA()
 {
-	while(1){
-		int i = 0;
-		//printf("<Tick:%d>",get_ticks());
-		delay(1);
-
-	}
+	int fd = open("/blah", O_CREAT);
+	printf("fd: %d\n", fd);
+	close(fd);
+	spin("TestA");
 }
 /*======================================================================*
                                TestB

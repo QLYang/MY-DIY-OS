@@ -59,6 +59,13 @@ struct dir_entry {
 };
 #define	DIR_ENTRY_SIZE	sizeof(struct dir_entry)
 
+/*file descriptor*/
+struct file_desc {
+	int		fd_mode;	/**< R or W */
+	int		fd_pos;		/**< Current position for R/W. */
+	struct inode*	fd_inode;	/**< Ptr to the i-node */
+};
+
 /*---------------------Read-Write sector-----------------------*/
 #define RD_SECT(dev,sect_nr) rw_sector(DEV_READ, \
 				       dev,				\

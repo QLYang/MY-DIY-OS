@@ -21,9 +21,13 @@ src19=lib/misc.c
 src20=kernel/systask.c
 src21=kernel/hd.c
 src22=fs/main.c
+src23=fs/misc.c
+src24=fs/open.c
+src25=lib/open.c
+src26=lib/close.c
 
 src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10) $(src11) $(src12) $(src13) $(src14) \
-	$(src15) $(src16) $(src17) $(src18) $(src19) $(src20)
+	$(src15) $(src16) $(src17) $(src18) $(src19) $(src20) $(src21) $(src22) $(src23) $(src24) $(src25) $(src26)
 #Target
 debug_tar1=boot.com
 debug_tar2=loader.bin
@@ -81,11 +85,15 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src20) -o systask.o
 	gcc $(gcc-flag) -c $(src21) -o hd.o
 	gcc $(gcc-flag) -c $(src22) -o fs_main.o
+	gcc $(gcc-flag) -c $(src23) -o fs_misc.o
+	gcc $(gcc-flag) -c $(src24) -o fs_open.o
+	gcc $(gcc-flag) -c $(src25) -o lib_open.o
+	gcc $(gcc-flag) -c $(src26) -o lib_close.o
 
 	ld -s -Ttext 0x30400 -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
 	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
 	 keyboard_interruption.o tty.o  console.o printf.o vsprintf.o misc.o \
-	 systask.o hd.o fs_main.o -o $(tar3)
+	 systask.o hd.o fs_main.o fs_misc.o fs_open.o lib_open.o lib_close.o -o $(tar3)
 
 	sudo mount -o loop $(img) /mnt/floppy/
 	sudo cp $(tar3) /mnt/floppy/ -v
