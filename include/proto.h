@@ -56,7 +56,7 @@ PUBLIC void 	inform_int(int task_nr);
 
 /*syscall.asm*/
 PUBLIC int 		get_ticks();
-PUBLIC void 	write(char* buf, int len);
+//PUBLIC void 	write(char* buf, int len);
 
 /*tty.c*/
 PUBLIC void 	task_tty();
@@ -103,6 +103,15 @@ PUBLIC int 		do_close();
 /*fs/misc.c*/
 PUBLIC int 		search_file(char * path);
 PUBLIC int 		strip_path(char * filename, const char * pathname,struct inode** ppinode);
+
+/*fs/read_write.c*/
+PUBLIC int do_rdwt();
+
+/*lib/read.c*/
+PUBLIC int read(int fd, void *buf, int count);
+
+/*lib/write.c*/
+PUBLIC int write(int fd, const void *buf, int count);
 
 
 
