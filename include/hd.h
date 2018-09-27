@@ -143,5 +143,5 @@ struct part_ent {
 					      ((drv) << 4) |		\
 					      (lba_highest & 0xF) | 0xA0)
 
-
+#define MAX_IO_BYTES	256	/* how many sectors does one IO can handle */
 #endif

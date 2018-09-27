@@ -113,6 +113,16 @@ PUBLIC int read(int fd, void *buf, int count);
 /*lib/write.c*/
 PUBLIC int write(int fd, const void *buf, int count);
 
+/* fs/disklog.c */
+PUBLIC int		do_disklog();
+PUBLIC int		disklog(char * logstr); /* for debug */
+PUBLIC void		dump_fd_graph(const char * fmt, ...);
+
+/*lib/getpid.c*/
+PUBLIC int getpid();
+
+/*lib/syslog.c*/
+PUBLIC int syslog(const char *fmt, ...);
 
 
 

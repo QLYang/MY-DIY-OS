@@ -116,7 +116,7 @@ enum msgtype {
 	HARD_INT = 1,
 
 	/* SYS task */
-	GET_TICKS,
+	GET_TICKS,GET_PID,
 
 	/* message type for drivers */
 	DEV_OPEN = 1001,
@@ -126,8 +126,8 @@ enum msgtype {
 	DEV_IOCTL,
 
 	/* FS */
-	OPEN=1100,
-	CLOSE=1101,
+	OPEN,
+	CLOSE,
 	READ,
 	WRITE,
 	LSEEK,
@@ -136,6 +136,8 @@ enum msgtype {
 
 	/* TTY, SYS, FS, MM, etc */
 	SYSCALL_RET,
+	/* for debug */
+	DISK_LOG,
 };
 
 /* 8253/8254 PIT (Programmable Interval Timer) */
@@ -154,6 +156,8 @@ enum msgtype {
 #define	FLAGS				u.m3.m3i1
 #define	NAME_LEN			u.m3.m3i2
 #define	FD					u.m3.m3i1
+
+#define	PID		u.m3.m3i2
 /*hd_ioctl p->REQUEST*/
 #define	DIOCTL_GET_GEO		1
 
@@ -233,4 +237,10 @@ enum msgtype {
 #define SEEK_END	3
 
 #define	MAX_PATH	128
+
+/*syslog*/
+#ifdef ENABLE_DISK_LOG
+#define SYSLOG syslog
+#endif
+
 #endif
