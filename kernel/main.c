@@ -64,7 +64,6 @@ PUBLIC int kernel_main()
 		p_proc->regs.esp = (u32)p_task_stack;
 		p_proc->regs.eflags = eflags;
 
-		p_proc->nr_tty = 0;
 		p_proc->p_flags = 0;
 		p_proc->p_msg = 0;
 		p_proc->p_recvfrom = NO_TASK;
@@ -80,10 +79,6 @@ PUBLIC int kernel_main()
 		p_task++;
 		selector_ldt += 1 << 3;
 	}
-
-	proc_table[NR_TASKS+0].nr_tty = 0;/*task_x*/
-    proc_table[NR_TASKS+1].nr_tty = 1;
-    proc_table[NR_TASKS+2].nr_tty = 1;
 
 	kernel_reenter = 0;
 	ticks = 0;
@@ -165,11 +160,33 @@ void TestA()
  *======================================================================*/
 void TestB()
 {
-	while(1){
-		int i = 0x1000;
-		//printf("B");
-		delay(1);
+	char tty_name[] = "/dev_tty1";
+
+	int fd_stdin  = open(tty_name, O_RDWR);
+	assert(fd_stdin  == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
+
+	char rdbuf[128];
+
+	while (1) {
+		write(fd_stdout, "$ ", 2);
+		int r = read(fd_stdin, rdbuf, 70);
+		rdbuf[r] = 0;
+
+		if (strcmp(rdbuf, "hello") == 0) {
+			write(fd_stdout, "hello world!\n", 13);
+		}
+		else {
+			if (rdbuf[0]) {
+				write(fd_stdout, "{", 1);
+				write(fd_stdout, rdbuf, r);
+				write(fd_stdout, "}\n", 2);
+			}
+		}
 	}
+
+	assert(0); /* never arrive here */
 }
 /*======================================================================*
                                TestC

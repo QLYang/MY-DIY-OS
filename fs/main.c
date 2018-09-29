@@ -42,6 +42,9 @@ PUBLIC void task_fs()
 		case UNLINK:
 			fs_msg.RETVAL = do_unlink();
 			break;
+		case RESUME_PROC:
+			src = fs_msg.PROC_NR;
+			break;
 		default:
 			printl("fs_msg:%d",fs_msg.type);
 			dump_msg("FS::unknown message:", &fs_msg);
@@ -74,7 +77,7 @@ PUBLIC void task_fs()
 		/* case LSEEK: */
 		/* case EXIT: */
 		/* case STAT: */
-		/* case RESUME_PROC: */
+		case RESUME_PROC:
 		case DISK_LOG:
 			break;
 		default:
@@ -83,8 +86,10 @@ PUBLIC void task_fs()
 #endif
 
 		/* reply */
-		fs_msg.type = SYSCALL_RET;
-		send_recv(SEND, src, &fs_msg);
+		if (fs_msg.type != SUSPEND_PROC) {
+			fs_msg.type = SYSCALL_RET;
+			send_recv(SEND, src, &fs_msg);
+		}
 	}
 }
 

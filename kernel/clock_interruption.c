@@ -16,6 +16,9 @@ PUBLIC void clock_handler(int irq){
 	if (kernel_reenter!=0){
 		return;
 	}
+	if (key_pressed)
+		inform_int(TASK_TTY);
+
 	if (p_proc_ready->ticks>0){/*在当前进程的ticks减到0之前，其他进程没有执行机会*/
 		return;
 	}

@@ -41,6 +41,7 @@ PUBLIC void keyboard_handler(int irq){
 		}
 		kb_in.count++;
 	}
+	key_pressed = 1;
 	/*keyboard_read();*/
 	/*print_scan_code();*/
 }

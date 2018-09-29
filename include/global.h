@@ -42,3 +42,9 @@ EXTERN	struct super_block	super_block[NR_SUPER_BLOCK];
 EXTERN	MESSAGE				fs_msg;
 EXTERN	struct proc *		pcaller;
 EXTERN	struct inode *		root_inode;
+
+EXTERN	int	key_pressed; /**
+			      * used for clock_handler
+			      * to wake up TASK_TTY when
+			      * a key is pressed
+			      */

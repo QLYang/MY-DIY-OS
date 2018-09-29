@@ -138,6 +138,9 @@ enum msgtype {
 	SYSCALL_RET,
 	/* for debug */
 	DISK_LOG,
+
+	/* FS & TTY */
+	SUSPEND_PROC, RESUME_PROC,
 };
 
 /* 8253/8254 PIT (Programmable Interval Timer) */

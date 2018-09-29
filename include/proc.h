@@ -39,8 +39,6 @@ typedef struct proc {/*保存进程相关信息*/
 	int has_int_msg;
 	struct proc * q_sending;
 	struct proc * next_sending;
-	/*tty-console*/
-	int nr_tty;
 	/*file descriptor*/
 	struct file_desc * filp[NR_FILES];
 }PROCESS;
