@@ -68,9 +68,9 @@ PUBLIC void 	select_console(int nr_console);
 PUBLIC void 	out_char(CONSOLE* p_con, char ch);
 PUBLIC void 	scroll_screen(CONSOLE* p_con, int direction);
 
-/* printf.c */
+/* lib/printf.c */
 PUBLIC  int     printf(const char *fmt, ...);
-#define	printl	printf
+PUBLIC int 		printl(const char *fmt, ...);
 
 /* vsprintf.c */
 PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);

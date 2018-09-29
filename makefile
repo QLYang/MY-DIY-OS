@@ -15,7 +15,7 @@ src13=kernel/proc.c
 src14=kernel/keyboard_interruption.c
 src15=kernel/tty.c
 src16=kernel/console.c
-src17=kernel/printf.c
+src17=lib/printf.c
 src18=kernel/vsprintf.c
 src19=lib/misc.c
 src20=kernel/systask.c
@@ -93,7 +93,7 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src14) -o keyboard_interruption.o
 	gcc $(gcc-flag) -c $(src15) -o tty.o
 	gcc $(gcc-flag) -c $(src16) -o console.o
-	gcc $(gcc-flag) -c $(src17) -o printf.o
+	gcc $(gcc-flag) -c $(src17) -o lib_printf.o
 	gcc $(gcc-flag) -c $(src18) -o vsprintf.o
 	gcc $(gcc-flag) -c $(src19) -o misc.o
 	gcc $(gcc-flag) -c $(src20) -o systask.o
@@ -114,7 +114,7 @@ evething:$(src)
 
 	ld -s -Ttext $(ENTRY_POINT) -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
 	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
-	 keyboard_interruption.o tty.o  console.o printf.o vsprintf.o misc.o \
+	 keyboard_interruption.o tty.o  console.o lib_printf.o vsprintf.o misc.o \
 	 systask.o hd.o fs_main.o fs_misc.o fs_open.o lib_open.o lib_close.o \
 	 fs_read_write.o lib_read.o lib_write.o lib_getpid.o lib_syslog.o fs_disklog.o \
 	 fs_link.o lib_unlink.o -o $(tar3)
