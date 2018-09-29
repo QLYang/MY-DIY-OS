@@ -16,7 +16,7 @@ PUBLIC void 	disp_int(int input);
 PUBLIC void		delay(int time);
 PUBLIC void 	clear();
 PUBLIC int 		memcmp(const void * s1, const void *s2, int n);
-
+PUBLIC int      strcmp(const char * s1, const char *s2);
 /* protect.c */
 PUBLIC void		init_prot();
 PUBLIC u32		seg2phys(u16 seg);
@@ -105,24 +105,30 @@ PUBLIC int 		search_file(char * path);
 PUBLIC int 		strip_path(char * filename, const char * pathname,struct inode** ppinode);
 
 /*fs/read_write.c*/
-PUBLIC int do_rdwt();
+PUBLIC int 		do_rdwt();
 
 /*lib/read.c*/
-PUBLIC int read(int fd, void *buf, int count);
+PUBLIC int 		read(int fd, void *buf, int count);
 
 /*lib/write.c*/
-PUBLIC int write(int fd, const void *buf, int count);
+PUBLIC int 		write(int fd, const void *buf, int count);
 
 /* fs/disklog.c */
 PUBLIC int		do_disklog();
 PUBLIC int		disklog(char * logstr); /* for debug */
 PUBLIC void		dump_fd_graph(const char * fmt, ...);
 
+/*fs/link.c*/
+PUBLIC int 		do_unlink();
+
+/*lib/unlink.c*/
+PUBLIC int 		unlink(const char * pathname);
+
 /*lib/getpid.c*/
-PUBLIC int getpid();
+PUBLIC int 		getpid();
 
 /*lib/syslog.c*/
-PUBLIC int syslog(const char *fmt, ...);
+PUBLIC int 		syslog(const char *fmt, ...);
 
 
 

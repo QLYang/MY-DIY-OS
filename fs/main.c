@@ -39,6 +39,9 @@ PUBLIC void task_fs()
 		case WRITE:
 			fs_msg.CNT = do_rdwt();
 			break;
+		case UNLINK:
+			fs_msg.RETVAL = do_unlink();
+			break;
 		default:
 			printl("fs_msg:%d",fs_msg.type);
 			dump_msg("FS::unknown message:", &fs_msg);
@@ -59,18 +62,18 @@ PUBLIC void task_fs()
 	/* msg_name[STAT]   = "STAT"; */
 
 	switch (msgtype) {
+		case UNLINK:
 		case OPEN:
 		case CLOSE:
 		case READ:
 		case WRITE:
-		/* case FORK: */
 			dump_fd_graph("%s just finished.", msg_name[msgtype]);
 			//panic("");
+			break;
+		/* case FORK: */
 		/* case LSEEK: */
-		/* case UNLINK: */
 		/* case EXIT: */
 		/* case STAT: */
-			break;
 		/* case RESUME_PROC: */
 		case DISK_LOG:
 			break;
