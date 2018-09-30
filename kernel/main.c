@@ -130,16 +130,15 @@ void Init()
 
 	printf("Init() is running ...\n");
 
-	//int pid = fork();
-	//if (pid != 0) { /* parent process */
-		//printf("parent is running, child pid:%d\n", pid);
-		//spin("parent");
-	//}
-	//else {	/* child process */
-		//printf("child is running, pid:%d\n", getpid());
-		//spin("child");
-	//}
-	spin("Init.");
+	int pid = fork();
+	if (pid != 0) { /* parent process */
+		printf("parent is running, child pid:%d\n", pid);
+		spin("parent");
+	}
+	else {	/* child process */
+		printf("child is running, pid:%d\n", getpid());
+		spin("child");
+	}
 }
 /*======================================================================*
                                TestA

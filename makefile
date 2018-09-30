@@ -33,10 +33,13 @@ src31=lib/syslog.c
 src32=fs/disklog.c
 src33=fs/link.c
 src34=lib/unlink.c
+src35=lib/fork.c
+src36=mm/main.c
+src37=mm/forkexit.c
 
 src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10) $(src11) $(src12) $(src13) $(src14) \
 	$(src15) $(src16) $(src17) $(src18) $(src19) $(src20) $(src21) $(src22) $(src23) $(src24) $(src25) $(src26) \
-	$(src27) $(src28) $(src29) $(src30) $(src31) $(src32) $(src33) $(src34)
+	$(src27) $(src28) $(src29) $(src30) $(src31) $(src32) $(src33) $(src34) $(src35) $(src36) $(src37)
 #Entry Point
 ENTRY_POINT=0x1000
 #Target
@@ -111,13 +114,16 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src32) -o fs_disklog.o
 	gcc $(gcc-flag) -c $(src33) -o fs_link.o
 	gcc $(gcc-flag) -c $(src34) -o lib_unlink.o
+	gcc $(gcc-flag) -c $(src35) -o lib_fork.o
+	gcc $(gcc-flag) -c $(src36) -o mm_main.o
+	gcc $(gcc-flag) -c $(src37) -o mm_forkexit.o
 
 	ld -s -Ttext $(ENTRY_POINT) -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
 	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
 	 keyboard_interruption.o tty.o  console.o lib_printf.o vsprintf.o misc.o \
 	 systask.o hd.o fs_main.o fs_misc.o fs_open.o lib_open.o lib_close.o \
 	 fs_read_write.o lib_read.o lib_write.o lib_getpid.o lib_syslog.o fs_disklog.o \
-	 fs_link.o lib_unlink.o -o $(tar3)
+	 fs_link.o lib_unlink.o lib_fork.o mm_main.o mm_forkexit.o -o $(tar3)
 
 	sudo mount -o loop $(img) /mnt/floppy/
 	sudo cp $(tar3) /mnt/floppy/ -v

@@ -104,12 +104,14 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define TASK_SYS		1
 #define TASK_HD			2
 #define TASK_FS			3
+#define TASK_MM			4
+#define INIT  			5
 /* Process */
 #define SENDING   		0x02	/* set when proc trying to send */
 #define RECEIVING 		0x04	/* set when proc trying to recv */
-#define FREE_SLOT 0x20	/* set when proc table entry is not used
-			 				* (ok to allocated to a new process)
-			 				*/
+#define FREE_SLOT 		0x20	/* set when proc table entry is not used
+			 					* (ok to allocated to a new process)
+			 					*/
 
 enum msgtype {
 	/*
@@ -144,6 +146,9 @@ enum msgtype {
 
 	/* FS & TTY */
 	SUSPEND_PROC, RESUME_PROC,
+
+	/* MM */
+	FORK, EXIT,
 };
 
 /* 8253/8254 PIT (Programmable Interval Timer) */
@@ -163,7 +168,9 @@ enum msgtype {
 #define	NAME_LEN			u.m3.m3i2
 #define	FD					u.m3.m3i1
 
-#define	PID		u.m3.m3i2
+#define	PID					u.m3.m3i2
+#define	STATUS				u.m3.m3i1
+
 /*hd_ioctl p->REQUEST*/
 #define	DIOCTL_GET_GEO		1
 
@@ -245,8 +252,8 @@ enum msgtype {
 #define	MAX_PATH	128
 
 /*syslog*/
-#ifdef ENABLE_DISK_LOG
+//#ifdef ENABLE_DISK_LOG
 #define SYSLOG syslog
-#endif
+//#endif
 
 #endif

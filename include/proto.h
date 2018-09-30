@@ -57,10 +57,10 @@ PUBLIC	void	reset_msg(MESSAGE* p);
 PUBLIC	void	dump_msg(const char * title, MESSAGE* m);
 PUBLIC	void	dump_proc(struct proc * p);
 PUBLIC	int		send_recv(int function, int src_dest, MESSAGE* msg);
-PUBLIC void 	inform_int(int task_nr);
+PUBLIC  void 	inform_int(int task_nr);
 
 /*syscall.asm*/
-PUBLIC int 		get_ticks();
+PUBLIC  int 	get_ticks();
 //PUBLIC void 	write(char* buf, int len);
 
 /*tty.c*/
@@ -72,10 +72,6 @@ PUBLIC void 	init_screen(TTY* p_tty);
 PUBLIC void 	select_console(int nr_console);
 PUBLIC void 	out_char(CONSOLE* p_con, char ch);
 PUBLIC void 	scroll_screen(CONSOLE* p_con, int direction);
-
-/* lib/printf.c */
-PUBLIC  int     printf(const char *fmt, ...);
-PUBLIC int 		printl(const char *fmt, ...);
 
 /* vsprintf.c */
 PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
@@ -95,12 +91,6 @@ PUBLIC struct 	inode * get_inode(int dev, int num);
 PUBLIC void 	put_inode(struct inode * pinode);
 PUBLIC void 	sync_inode(struct inode * p);
 
-/*lib/open.c*/
-PUBLIC int 		open(const char *pathname, int flags);
-
-/*lib/close.c*/
-PUBLIC int 		close(int fd);
-
 /*fs/open.c*/
 PUBLIC int 		do_open();
 PUBLIC int 		do_close();
@@ -112,19 +102,25 @@ PUBLIC int 		strip_path(char * filename, const char * pathname,struct inode** pp
 /*fs/read_write.c*/
 PUBLIC int 		do_rdwt();
 
+/*fs/link.c*/
+PUBLIC int 		do_unlink();
+
+/*mm/main.c*/
+PUBLIC void 	task_mm();
+PUBLIC int alloc_mem(int pid, int memsize);
+
+/*-------------------------Lib Function--------------------------------*/
+/*lib/open.c*/
+PUBLIC int 		open(const char *pathname, int flags);
+
+/*lib/close.c*/
+PUBLIC int 		close(int fd);
+
 /*lib/read.c*/
 PUBLIC int 		read(int fd, void *buf, int count);
 
 /*lib/write.c*/
 PUBLIC int 		write(int fd, const void *buf, int count);
-
-/* fs/disklog.c */
-PUBLIC int		do_disklog();
-PUBLIC int		disklog(char * logstr); /* for debug */
-PUBLIC void		dump_fd_graph(const char * fmt, ...);
-
-/*fs/link.c*/
-PUBLIC int 		do_unlink();
 
 /*lib/unlink.c*/
 PUBLIC int 		unlink(const char * pathname);
@@ -132,9 +128,12 @@ PUBLIC int 		unlink(const char * pathname);
 /*lib/getpid.c*/
 PUBLIC int 		getpid();
 
-/*lib/syslog.c*/
-PUBLIC int 		syslog(const char *fmt, ...);
+/*lib/fork.c*/
+PUBLIC int 		fork();
 
+/* lib/printf.c */
+PUBLIC  int     printf(const char *fmt, ...);
+PUBLIC  int 	printl(const char *fmt, ...);/*Low level write*/
 
 
 /* -------------------系统调用 - 系统级 ------------------------------------*/
@@ -148,3 +147,11 @@ PUBLIC  void    sys_call();             /* int_handler */
 /*------------------- 系统调用 - 用户级 --------------------------------------*/
 PUBLIC	int		sendrec(int function, int src_dest, MESSAGE* p_msg);
 PUBLIC	int		printx(char* str);
+
+/*----------------------File System Debug----------------------------------*/
+/*lib/syslog.c*/
+PUBLIC int 		syslog(const char *fmt, ...);
+/* fs/disklog.c */
+PUBLIC int		do_disklog();
+PUBLIC int		disklog(char * logstr); /* for debug */
+PUBLIC void		dump_fd_graph(const char * fmt, ...);

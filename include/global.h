@@ -44,7 +44,12 @@ EXTERN	struct proc *		pcaller;
 EXTERN	struct inode *		root_inode;
 
 EXTERN	int	key_pressed; /**
-			      * used for clock_handler
-			      * to wake up TASK_TTY when
-			      * a key is pressed
-			      */
+			      			* used for clock_handler
+			      			* to wake up TASK_TTY when
+			      			* a key is pressed
+			      			*/
+/* MM */
+EXTERN	MESSAGE				mm_msg;
+extern	u8 *				mmbuf;
+extern	const int			MMBUF_SIZE;
+EXTERN	int					memory_size;
