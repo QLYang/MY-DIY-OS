@@ -21,50 +21,56 @@ typedef struct s_stackframe {/*一系列寄存器的值组成一个栈帧*/
 
 
 typedef struct proc {/*保存进程相关信息*/
-	STACK_FRAME regs;
+	STACK_FRAME 		regs;
 
-	u16 ldt_sel;
-	DESCRIPTOR ldts[LDT_SIZE];
+	u16 				ldt_sel;
+	DESCRIPTOR 			ldts[LDT_SIZE];
 
-	int ticks;		/*剩余的执行时间*/
-	int priority;
+	int 				ticks;		/*剩余的执行时间*/
+	int 				priority;
 
-	u32 pid;
-	char name[16];
+	u32 				pid;
+	char 				name[16];
 	/*msg*/
-	int  p_flags;
-	MESSAGE * p_msg;
-	int p_recvfrom;
-	int p_sendto;
-	int has_int_msg;
-	struct proc * q_sending;
-	struct proc * next_sending;
+	int  				p_flags;
+	MESSAGE * 			p_msg;
+	int 				p_recvfrom;
+	int 				p_sendto;
+	int 				has_int_msg;
+	struct proc * 		q_sending;
+	struct proc * 		next_sending;
 	/*file descriptor*/
 	struct file_desc * filp[NR_FILES];
+
+	int p_parent; /**< pid of parent process */
 }PROCESS;
 
 typedef struct task {
-	task_f	initial_eip;
-	int	stacksize;
-	char	name[32];
+	task_f				initial_eip;
+	int					stacksize;
+	char				name[32];
 }TASK;
 
 #define proc2pid(x) (x - proc_table)
 
 /* Number of tasks and procs*/
-#define NR_TASKS	4
-#define NR_PROCS	3
+#define NR_TASKS			4
+#define NR_PROCS			32
+#define NR_NATIVE_PROCS 	4
 
 #define FIRST_PROC	proc_table[0]
 #define LAST_PROC	proc_table[NR_TASKS + NR_PROCS - 1]
 /* stacks of tasks */
-#define STACK_SIZE_TESTA	0x8000
-#define STACK_SIZE_TESTB	0x8000
-#define STACK_SIZE_TESTC	0x8000
+#define	STACK_SIZE_DEFAULT	0x4000 /* 16 KB */
 
-#define STACK_SIZE_TTY		0x8000
-#define STACK_SIZE_SYS		0x8000
-#define STACK_SIZE_HD		0x8000
-#define STACK_SIZE_FS		0x8000
+#define STACK_SIZE_INIT		STACK_SIZE_DEFAULT
+#define STACK_SIZE_TESTA	STACK_SIZE_DEFAULT
+#define STACK_SIZE_TESTB	STACK_SIZE_DEFAULT
+#define STACK_SIZE_TESTC	STACK_SIZE_DEFAULT
 
-#define STACK_SIZE_TOTAL	(STACK_SIZE_TESTA+STACK_SIZE_TESTB+STACK_SIZE_TESTC+STACK_SIZE_TTY+STACK_SIZE_SYS+STACK_SIZE_HD+STACK_SIZE_FS)
+#define STACK_SIZE_TTY		STACK_SIZE_DEFAULT
+#define STACK_SIZE_SYS		STACK_SIZE_DEFAULT
+#define STACK_SIZE_HD		STACK_SIZE_DEFAULT
+#define STACK_SIZE_FS		STACK_SIZE_DEFAULT
+
+#define STACK_SIZE_TOTAL	(STACK_SIZE_INIT+STACK_SIZE_TESTA+STACK_SIZE_TESTB+STACK_SIZE_TESTC+STACK_SIZE_TTY+STACK_SIZE_SYS+STACK_SIZE_HD+STACK_SIZE_FS)

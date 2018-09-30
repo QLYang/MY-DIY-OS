@@ -11,3 +11,7 @@ KernelEntryPointPhyAddr	equ	0x1000 	;Remember to change the flag while ld!
 
 PageDirBase		equ	100000h	; 页目录开始地址:			2M
 PageTblBase		equ	101000h	; 页表开始地址:			2M + 4K
+
+;;     Macros below should corresponding with C source.
+BOOT_PARAM_ADDR		equ	0x900
+BOOT_PARAM_MAGIC	equ	0xB007

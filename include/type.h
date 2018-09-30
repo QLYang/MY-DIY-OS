@@ -5,11 +5,11 @@ typedef	unsigned int		u32;
 typedef	unsigned short		u16;
 typedef	unsigned char		u8;
 
-typedef	void	(*int_handler)	();
-typedef	void	(*task_f)	();
-typedef	void	(*irq_handler)	(int irq);
-typedef void*	system_call;
-typedef	char *	va_list;
+typedef	void				(*int_handler)	();
+typedef	void				(*task_f)	();
+typedef	void				(*irq_handler)	(int irq);
+typedef void*				system_call;
+typedef	char*				va_list;
 
 struct mess1 {
 	int m1i1;
@@ -42,5 +42,10 @@ typedef struct {
 		struct mess3 m3;
 	} u;
 } MESSAGE;
+
+struct boot_params {
+	int				mem_size;	/* memory size */
+	unsigned char *	kernel_file;	/* addr of kernel file */
+};
 
 #endif

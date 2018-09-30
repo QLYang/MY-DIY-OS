@@ -349,8 +349,17 @@ LABEL_PM_START:
 	call 	SetupPaging
 
 	call	InitKernel
-
-	jmp		SelectorFlatC:KernelEntryPointPhyAddr
+;--------------------------------------
+	;; fill in BootParam[]
+	mov		dword [BOOT_PARAM_ADDR], BOOT_PARAM_MAGIC ; Magic Number
+	mov		eax, [dwMemSize]
+	mov		[BOOT_PARAM_ADDR + 4], eax ; memory size
+	mov		eax, BaseOfKernelFile
+	shl		eax, 4
+	add		eax, OffsetOfKernelFile
+	mov		[BOOT_PARAM_ADDR + 8], eax ; phy-addr of kernel.bin
+;--------------------------------------
+	jmp		SelectorFlatC:KernelEntryPointPhyAddr ; 正式进入内核
 
 ;--------------------------------------
 ;void* MemCpy(void* es:pDest, void* ds:pSrc, int iSize)

@@ -17,14 +17,19 @@ PUBLIC void		delay(int time);
 PUBLIC void 	clear();
 PUBLIC int 		memcmp(const void * s1, const void *s2, int n);
 PUBLIC int      strcmp(const char * s1, const char *s2);
+PUBLIC void 	get_boot_params(struct boot_params * pbp);
+PUBLIC int 		get_kernel_map(unsigned int * b, unsigned int * l);
+
 /* protect.c */
 PUBLIC void		init_prot();
-PUBLIC u32		seg2phys(u16 seg);
+PUBLIC u32		seg2linear(u16 seg);
+PUBLIC void 	init_desc(DESCRIPTOR *p_desc,u32 base,u32 limit,u16 attribute);
 
 /* kernel.asm */
 void restart();
 
 /* main.c */
+void Init();
 void TestA();
 void TestB();
 void TestC();

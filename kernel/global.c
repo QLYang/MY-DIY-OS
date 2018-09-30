@@ -27,6 +27,7 @@ PUBLIC	TASK	task_table[NR_TASKS] = {
 	{task_hd, STACK_SIZE_HD, "hd"},
 	{task_fs, STACK_SIZE_FS, "fs"},};
 PUBLIC  TASK    user_proc_table[NR_PROCS] = {
+	{Init,   STACK_SIZE_INIT,  "INIT" },
 	{TestA, STACK_SIZE_TESTA, "TestA"},
 	{TestB, STACK_SIZE_TESTB, "TestB"},
 	{TestC, STACK_SIZE_TESTC, "TestC"},};

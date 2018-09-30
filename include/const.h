@@ -107,6 +107,9 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 /* Process */
 #define SENDING   		0x02	/* set when proc trying to send */
 #define RECEIVING 		0x04	/* set when proc trying to recv */
+#define FREE_SLOT 0x20	/* set when proc table entry is not used
+			 				* (ok to allocated to a new process)
+			 				*/
 
 enum msgtype {
 	/*
