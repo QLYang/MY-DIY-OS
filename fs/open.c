@@ -9,11 +9,11 @@
 #include "keyboard.h"
 #include "proto.h"
 
-PRIVATE struct inode * create_file(char * path, int flags);
-PRIVATE int alloc_imap_bit(int dev);
-PRIVATE int alloc_smap_bit(int dev, int nr_sects_to_alloc);
-PRIVATE struct inode * new_inode(int dev, int inode_nr, int start_sect);
-PRIVATE void new_dir_entry(struct inode *dir_inode,int inode_nr,char *filename);
+PRIVATE struct 	inode * create_file(char * path, int flags);
+PRIVATE int 	alloc_imap_bit(int dev);
+PRIVATE int 	alloc_smap_bit(int dev, int nr_sects_to_alloc);
+PRIVATE struct 	inode * new_inode(int dev, int inode_nr, int start_sect);
+PRIVATE void 	new_dir_entry(struct inode *dir_inode,int inode_nr,char *filename);
 /*****************************************************************************
  *                                do_open
  *****************************************************************************/
@@ -58,7 +58,7 @@ PUBLIC int do_open()
 	if (i >= NR_FILE_DESC)
 		panic("f_desc_table[] is full (PID:%d)", proc2pid(pcaller));
 
-	int inode_nr = search_file(pathname);//need to certify
+	int inode_nr = search_file(pathname);
 
 	struct inode * pin = 0;
 	if (flags & O_CREAT) {
@@ -67,7 +67,7 @@ PUBLIC int do_open()
 			return -1;
 		}
 		else {
-			pin = create_file(pathname, flags);//need to certify
+			pin = create_file(pathname, flags);
 		}
 	}
 	else {
@@ -75,9 +75,9 @@ PUBLIC int do_open()
 
 		char filename[MAX_PATH];
 		struct inode * dir_inode;
-		if (strip_path(filename, pathname, &dir_inode) != 0)//need to certify
+		if (strip_path(filename, pathname, &dir_inode) != 0)
 			return -1;
-		pin = get_inode(dir_inode->i_dev, inode_nr);//need to certify
+		pin = get_inode(dir_inode->i_dev, inode_nr);/*inode->i_cnt++*/
 	}
 
 	if (pin) {
@@ -88,7 +88,7 @@ PUBLIC int do_open()
 		f_desc_table[i].fd_inode = pin;
 
 		f_desc_table[i].fd_mode = flags;
-		/* f_desc_table[i].fd_cnt = 1; */
+		f_desc_table[i].fd_cnt = 1;/*Not '+=1',because all procs are forked from Init*/
 		f_desc_table[i].fd_pos = 0;
 
 		int imode = pin->i_mode & I_TYPE_MASK;

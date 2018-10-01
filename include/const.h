@@ -112,6 +112,8 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define FREE_SLOT 		0x20	/* set when proc table entry is not used
 			 					* (ok to allocated to a new process)
 			 					*/
+#define WAITING   		0x08	/* set when proc waiting for the child to terminate */
+#define HANGING   		0x10	/* set when proc exits without being waited by parent */
 
 enum msgtype {
 	/*
@@ -148,7 +150,7 @@ enum msgtype {
 	SUSPEND_PROC, RESUME_PROC,
 
 	/* MM */
-	FORK, EXIT,
+	FORK, EXIT,WAIT,
 };
 
 /* 8253/8254 PIT (Programmable Interval Timer) */
@@ -212,7 +214,7 @@ enum msgtype {
 #define	P_PRIMARY			0
 #define	P_EXTENDED			1
 
-#define our_PART			0x99	/* Our partition */
+#define Our_PART			0x99	/* Our partition */
 #define NO_PART				0x00	/* unused entry */
 #define EXT_PART			0x05	/* extended partition */
 

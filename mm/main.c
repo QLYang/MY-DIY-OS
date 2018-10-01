@@ -34,17 +34,17 @@ PUBLIC void task_mm()
 		case FORK:
 			mm_msg.RETVAL = do_fork();
 			break;
-		//case EXIT:
-			//do_exit(mm_msg.STATUS);
-			//reply = 0;
-			//break;
+		case EXIT:
+			do_exit(mm_msg.STATUS);
+			reply = 0;
+			break;
 		/* case EXEC: */
 		/* 	mm_msg.RETVAL = do_exec(); */
 		/* 	break; */
-		//case WAIT:
-			//do_wait();
-			//reply = 0;
-			//break;
+		case WAIT:
+			do_wait();
+			reply = 0;
+			break;
 		default:
 			dump_msg("MM::unknown msg", &mm_msg);
 			assert(0);
@@ -104,4 +104,22 @@ PUBLIC int alloc_mem(int pid, int memsize)
 		panic("memory allocation failed. pid:%d", pid);
 
 	return base;
+}
+
+/*****************************************************************************
+ *                                free_mem
+ *****************************************************************************/
+/**
+ * Free a memory block. Because a memory block is corresponding with a PID, so
+ * we don't need to really `free' anything. In another word, a memory block is
+ * dedicated to one and only one PID, no matter what proc actually uses this
+ * PID.
+ *
+ * @param pid  Whose memory is to be freed.
+ *
+ * @return  Zero if success.
+ *****************************************************************************/
+PUBLIC int free_mem(int pid)
+{
+	return 0;
 }

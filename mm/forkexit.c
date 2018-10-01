@@ -9,6 +9,7 @@
 #include "keyboard.h"
 #include "proto.h"
 
+PRIVATE void cleanup(struct proc * proc);
 /*****************************************************************************
  *                                do_fork
  *****************************************************************************/
@@ -100,10 +101,9 @@ PUBLIC int do_fork()
 		  (PROC_IMAGE_SIZE_DEFAULT - 1) >> LIMIT_4K_SHIFT,
 		  DA_LIMIT_4K | DA_32 | DA_DRW | PRIVILEGE_USER << 5);
 	/* tell FS, see fs_fork() */
-	MESSAGE msg2fs;
-	msg2fs.type = FORK;
-	msg2fs.PID = child_pid;
-	send_recv(BOTH, TASK_FS, &msg2fs);
+	fs_msg.type = FORK;
+	fs_msg.PID = child_pid;
+	send_recv(BOTH, TASK_FS, &fs_msg);
 	/* child PID will be returned to the parent proc */
 	mm_msg.PID = child_pid;
 
@@ -114,4 +114,154 @@ PUBLIC int do_fork()
 	m.PID = 0;
 	send_recv(SEND, child_pid, &m);
 	return 0;
+}
+
+/*****************************************************************************
+ *                                do_exit
+ *****************************************************************************/
+/**
+ * Perform the exit() syscall.
+ *
+ * If proc A calls exit(), then MM will do the following in this routine:
+ *     <1> inform FS so that the fd-related things will be cleaned up
+ *     <2> free A's memory
+ *     <3> set A.exit_status, which is for the parent
+ *     <4> depends on parent's status. if parent (say P) is:
+ *           (1) WAITING
+ *                 - clean P's WAITING bit, and
+ *                 - send P a message to unblock it
+ *                 - release A's proc_table[] slot
+ *           (2) not WAITING
+ *                 - set A's HANGING bit
+ *     <5> iterate proc_table[], if proc B is found as A's child, then:
+ *           (1) make INIT the new parent of B, and
+ *           (2) if INIT is WAITING and B is HANGING, then:
+ *                 - clean INIT's WAITING bit, and
+ *                 - send INIT a message to unblock it
+ *                 - release B's proc_table[] slot
+ *               else
+ *                 if INIT is WAITING but B is not HANGING, then
+ *                     - B will call exit()
+ *                 if B is HANGING but INIT is not WAITING, then
+ *                     - INIT will call wait()
+ *
+ * TERMs:
+ *     - HANGING: everything except the proc_table entry has been cleaned up.
+ *     - WAITING: a proc has at least one child, and it is waiting for the
+ *                child(ren) to exit()
+ *     - zombie: say P has a child A, A will become a zombie if
+ *         - A exit(), and
+ *         - P does not wait(), neither does it exit(). that is to say, P just
+ *           keeps running without terminating itself or its child
+ *
+ * @param status  Exiting status for parent.
+ *
+ *****************************************************************************/
+PUBLIC void do_exit(int status)
+{
+	int i;
+	int pid = mm_msg.source; /* PID of caller */
+	int parent_pid = proc_table[pid].p_parent;
+	struct proc * p = &proc_table[pid];
+
+	/* tell FS, see fs_exit() */
+	fs_msg.type = EXIT;
+	fs_msg.PID = pid;
+	send_recv(BOTH, TASK_FS, &fs_msg);
+
+	free_mem(pid);
+
+	p->exit_status = status;
+
+	if (proc_table[parent_pid].p_flags & WAITING) { /* parent is waiting */
+		proc_table[parent_pid].p_flags &= ~WAITING;
+
+		cleanup(&proc_table[pid]);
+	}
+	else { /* parent is not waiting */
+		proc_table[pid].p_flags |= HANGING;
+	}
+
+	/* if the proc has any child, make INIT the new parent */
+	for (i = 0; i < NR_TASKS + NR_PROCS; i++) {
+		if (proc_table[i].p_parent == pid) { /* is a child */
+			proc_table[i].p_parent = INIT;
+			if ((proc_table[INIT].p_flags & WAITING) &&
+			    (proc_table[i].p_flags & HANGING)) {
+				proc_table[INIT].p_flags &= ~WAITING;
+				cleanup(&proc_table[i]);
+			}
+		}
+	}
+}
+/*****************************************************************************
+ *                                do_wait
+ *****************************************************************************/
+/**
+ * Perform the wait() syscall.
+ *
+ * If proc P calls wait(), then MM will do the following in this routine:
+ *     <1> iterate proc_table[],
+ *         if proc A is found as P's child and it is HANGING
+ *           - reply to P (cleanup() will send P a messageto unblock it)
+ *           - release A's proc_table[] entry
+ *           - return (MM will go on with the next message loop)
+ *     <2> if no child of P is HANGING
+ *           - set P's WAITING bit
+ *     <3> if P has no child at all
+ *           - reply to P with error
+ *     <4> return (MM will go on with the next message loop)
+ *
+ *****************************************************************************/
+PUBLIC void do_wait()
+{
+	int pid = mm_msg.source;
+
+	int i;
+	int children = 0;
+	struct proc* p_proc = proc_table;
+
+	for (i = 0; i < NR_TASKS + NR_PROCS; i++,p_proc++) {
+		if (p_proc->p_parent == pid) {
+			children++;
+			if (p_proc->p_flags & HANGING) {
+				cleanup(p_proc);
+				return;
+			}
+		}
+	}
+
+	if (children) {
+		/* has children, but no child is HANGING */
+		proc_table[pid].p_flags |= WAITING;
+
+	}
+	else {
+		/* no child at all */
+		MESSAGE msg;
+		msg.type = SYSCALL_RET;
+		msg.PID = NO_TASK;
+		send_recv(SEND, pid, &msg);
+	}
+}
+/*****************************************************************************
+ *                                cleanup
+ *****************************************************************************/
+/**
+ * Do the last jobs to clean up a proc thoroughly:
+ *     - Send proc's parent a message to unblock it, and
+ *     - release proc's proc_table[] entry
+ *
+ * @param proc  Process to clean up.
+ *****************************************************************************/
+PRIVATE void cleanup(struct proc * proc)
+{
+	MESSAGE msg2parent;
+	msg2parent.type = SYSCALL_RET;
+	msg2parent.PID = proc2pid(proc);
+	msg2parent.STATUS = proc->exit_status;
+
+	send_recv(SEND, proc->p_parent, &msg2parent);
+
+	proc->p_flags = FREE_SLOT;
 }

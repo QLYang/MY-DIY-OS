@@ -107,8 +107,13 @@ PUBLIC int 		do_unlink();
 
 /*mm/main.c*/
 PUBLIC void 	task_mm();
-PUBLIC int alloc_mem(int pid, int memsize);
+PUBLIC int 		alloc_mem(int pid, int memsize);
+PUBLIC int 		free_mem(int pid);
 
+/*mm/forkexit.c*/
+PUBLIC void 	do_exit(int status);
+PUBLIC int 		do_fork();
+PUBLIC void 	do_wait();
 /*-------------------------Lib Function--------------------------------*/
 /*lib/open.c*/
 PUBLIC int 		open(const char *pathname, int flags);
@@ -130,6 +135,12 @@ PUBLIC int 		getpid();
 
 /*lib/fork.c*/
 PUBLIC int 		fork();
+
+/*lib/exit.c*/
+PUBLIC void 	exit(int status);
+
+/*lib/wait.c*/
+PUBLIC int 		wait(int * status);
 
 /* lib/printf.c */
 PUBLIC  int     printf(const char *fmt, ...);

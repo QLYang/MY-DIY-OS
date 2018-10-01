@@ -40,9 +40,10 @@ typedef struct proc {/*保存进程相关信息*/
 	struct proc * 		q_sending;
 	struct proc * 		next_sending;
 	/*file descriptor*/
-	struct file_desc * filp[NR_FILES];
+	struct file_desc * 	filp[NR_FILES];
 
-	int p_parent; /**< pid of parent process */
+	int 				p_parent; /**< pid of parent process */
+	int 				exit_status; /**< for parent */
 }PROCESS;
 
 typedef struct task {

@@ -15,6 +15,7 @@ PRIVATE void 	mkfs();
 PRIVATE void 	read_super_block(int dev);
 PUBLIC struct 	super_block * get_super_block(int dev);
 PRIVATE int 	fs_fork();
+PRIVATE int 	fs_exit();
 /*****************************************************************************
  *                        task_fs    <Ring 1>
  *****************************************************************************/
@@ -49,6 +50,9 @@ PUBLIC void task_fs()
 		case FORK:
 			fs_msg.RETVAL = fs_fork();
 			break;
+		case EXIT:
+			fs_msg.RETVAL = fs_exit();
+			break;
 		default:
 			printl("fs_msg:%d",fs_msg.type);
 			dump_msg("FS::unknown message:", &fs_msg);
@@ -65,7 +69,7 @@ PUBLIC void task_fs()
 	msg_name[LSEEK]  = "LSEEK";
 	msg_name[UNLINK] = "UNLINK";
 	msg_name[FORK]   = "FORK";
-	/* msg_name[EXIT]   = "EXIT"; */
+	msg_name[EXIT]   = "EXIT";
 	/* msg_name[STAT]   = "STAT"; */
 
 	switch (msgtype) {
@@ -78,7 +82,7 @@ PUBLIC void task_fs()
 			break;
 		case FORK:
 		/* case LSEEK: */
-		/* case EXIT: */
+		case EXIT:
 		/* case STAT: */
 		case RESUME_PROC:
 		case DISK_LOG:
@@ -493,5 +497,35 @@ PRIVATE int fs_fork()
 		}
 	}
 
+	return 0;
+}
+
+/*****************************************************************************
+ *                                fs_exit
+ *****************************************************************************/
+/**
+ * Perform the aspects of exit() that relate to files.
+ *
+ * @return Zero if success.
+ *****************************************************************************/
+PRIVATE int fs_exit()
+{
+	int i;
+	struct proc* p = &proc_table[fs_msg.PID];//child_proc
+
+	struct proc pid_proc=proc_table[INIT];
+	struct inode*  pin = pid_proc.filp[1]->fd_inode;
+
+	for (i = 0; i < NR_FILES; i++) {
+		if (p->filp[i]) {
+			/* release the inode */
+			p->filp[i]->fd_cnt--;
+			p->filp[i]->fd_inode->i_cnt--;
+			/* if no procs sharing this file,release the file desc slot */
+			if (p->filp[i]->fd_cnt == 0)
+				p->filp[i]->fd_inode = 0;
+			p->filp[i] = 0;
+		}
+	}
 	return 0;
 }
