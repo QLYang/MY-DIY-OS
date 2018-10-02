@@ -72,36 +72,6 @@ PUBLIC int sys_sendrec(int function, int src_dest, MESSAGE* m, struct proc* p)
 	return 0;
 }
 
-/*============================================================================*
- *                                send_recv
- *============================================================================*/
-PUBLIC int send_recv(int function, int src_dest, MESSAGE* msg)
-{
-	int ret = 0;
-
-	if (function == RECEIVE)
-		memset(msg, 0, sizeof(MESSAGE));
-
-	switch (function) {
-	case BOTH:
-		ret = sendrec(SEND, src_dest, msg);
-		if (ret == 0)
-			ret = sendrec(RECEIVE, src_dest, msg);
-		break;
-	case SEND:
-	case RECEIVE:
-		ret = sendrec(function, src_dest, msg);
-		break;
-	default:
-		assert((function == BOTH) ||
-		       (function == SEND) || (function == RECEIVE));
-		break;
-	}
-
-	return ret;
-}
-
-
 /*****************************************************************************
  *				  ldt_seg_linear
  *****************************************************************************/

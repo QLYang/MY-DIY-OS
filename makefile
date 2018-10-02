@@ -61,15 +61,24 @@ tar= $(tar1) $(tar2) $(tar3)
 #Floppy
 img=a.img
 #Command
-.PHONY:all evething clean del_debug_file
+.PHONY:all evething clean del_debug_file make_runtime
 
 all:evething clean
+
+make_runtime:evething runtime clean
 
 clean:
 	sudo rm -f *.bin *.o
 
+#File system debug
 del_debug_file:
 	sudo rm -f *.png *.dot llsyslog
+
+#Make a runtime lib
+runtime:
+	ar rcs lib/c_runtime.a syscall.o lib_close.o lib_exit.o  lib_fork.o lib_getpid.o \
+	lib_open.o lib_printf.o lib_read.o lib_unlink.o lib_wait.o lib_write.o \
+	lib_misc.o k_lib.o k_liba.o vsprintf.o
 
 #must add ';' before define! Change bochsrc
 evething:$(src)
@@ -101,7 +110,7 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src16) -o console.o
 	gcc $(gcc-flag) -c $(src17) -o lib_printf.o
 	gcc $(gcc-flag) -c $(src18) -o vsprintf.o
-	gcc $(gcc-flag) -c $(src19) -o misc.o
+	gcc $(gcc-flag) -c $(src19) -o lib_misc.o
 	gcc $(gcc-flag) -c $(src20) -o systask.o
 	gcc $(gcc-flag) -c $(src21) -o hd.o
 	gcc $(gcc-flag) -c $(src22) -o fs_main.o
@@ -125,7 +134,7 @@ evething:$(src)
 
 	ld -s -Ttext $(ENTRY_POINT) -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
 	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
-	 keyboard_interruption.o tty.o  console.o lib_printf.o vsprintf.o misc.o \
+	 keyboard_interruption.o tty.o  console.o lib_printf.o vsprintf.o lib_misc.o \
 	 systask.o hd.o fs_main.o fs_misc.o fs_open.o lib_open.o lib_close.o \
 	 fs_read_write.o lib_read.o lib_write.o lib_getpid.o lib_syslog.o fs_disklog.o \
 	 fs_link.o lib_unlink.o lib_fork.o mm_main.o mm_forkexit.o lib_exit.o lib_wait.o \
