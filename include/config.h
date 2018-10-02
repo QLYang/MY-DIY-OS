@@ -18,3 +18,10 @@
 #define	BI_MAG					0
 #define	BI_MEM_SIZE				1
 #define	BI_KERNEL_FILE			2
+
+/**
+ * Some sector are reserved for us to copy a tar file
+ * there, which will be extracted and used by the OS.
+ */
+#define	INSTALL_START_SECT		0x8000
+#define	INSTALL_NR_SECTS		0x800

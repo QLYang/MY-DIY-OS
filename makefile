@@ -61,15 +61,21 @@ tar= $(tar1) $(tar2) $(tar3)
 #Floppy
 img=a.img
 #Command
-.PHONY:all evething clean del_debug_file make_runtime
+.PHONY:all evething clean del_debug_file make_runtime realclean
+#Normal Option
+all:evething realclean
 
-all:evething clean
+#Make runtime lib
+make_runtime:evething runtime realclean
 
-make_runtime:evething runtime clean
+#Only keep kernel.bin
+get_kernel_bin:evething clean
 
+#keep .bin
 clean:
-	sudo rm -f *.bin *.o
-
+	sudo rm -f *.o boot.bin loader.bin
+realclean:
+	sudo rm -f *.o *.bin
 #File system debug
 del_debug_file:
 	sudo rm -f *.png *.dot llsyslog
