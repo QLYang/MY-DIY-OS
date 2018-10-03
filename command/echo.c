@@ -2,10 +2,14 @@
 
 int main(int argc, char * argv[])
 {
-	int i;
-	for (i = 1; i < argc; i++)
-		printf("%s%s", i == 1 ? "" : " ", argv[i]);
-	printf("\n");
+	int i=1;
 
-	return 0;
+	int argc_con=argc;//??????????
+	char** argv_con=argv;
+
+	for(i;i<argc_con;i++){
+		printf("i:%s\n",argv_con[i]);
+	}
+
+	return 123;
 }

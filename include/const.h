@@ -150,7 +150,7 @@ enum msgtype {
 	SUSPEND_PROC, RESUME_PROC,
 
 	/* MM */
-	FORK, EXIT,WAIT,
+	FORK, EXIT,WAIT,EXEC,
 };
 
 /* 8253/8254 PIT (Programmable Interval Timer) */
@@ -172,6 +172,9 @@ enum msgtype {
 
 #define	PID					u.m3.m3i2
 #define	STATUS				u.m3.m3i1
+
+#define	NAME_LEN			u.m3.m3i2
+#define	BUF_LEN				u.m3.m3i3
 
 /*hd_ioctl p->REQUEST*/
 #define	DIOCTL_GET_GEO		1

@@ -135,15 +135,13 @@ void Init()
 
 	int pid = fork();
 	if (pid != 0) { /* parent process */
-		printf("parent is running, child pid:%d\n", pid);
 		int s;
 		int child = wait(&s);
 		printf("child (%d) exited with status: %d.\n", child, s);
 
 	}
 	else {	/* child process */
-		printf("child is running, pid:%d\n", getpid());
-		exit(123);
+		execl("/echo", "echo", "hello", "world", 0);
 	}
 	while (1) {
 		int s;
@@ -237,7 +235,7 @@ struct posix_tar_header
  *
  * @param filename The tar file.
  *****************************************************************************/
-void untar(const char * filename)
+PUBLIC void untar(const char * filename)
 {
 	printf("[extract `%s'\n", filename);
 	int fd = open(filename, O_RDWR);

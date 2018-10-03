@@ -35,6 +35,7 @@ void TestB();
 void TestC();
 PUBLIC int 		get_ticks();
 PUBLIC void 	panic(const char *fmt, ...);
+PUBLIC void untar(const char * filename);
 
 /*systask.c*/
 PUBLIC void 	task_sys();
@@ -98,6 +99,7 @@ PUBLIC int 		do_close();
 /*fs/misc.c*/
 PUBLIC int 		search_file(char * path);
 PUBLIC int 		strip_path(char * filename, const char * pathname,struct inode** ppinode);
+PUBLIC int 		do_stat();
 
 /*fs/read_write.c*/
 PUBLIC int 		do_rdwt();
@@ -114,6 +116,10 @@ PUBLIC int 		free_mem(int pid);
 PUBLIC void 	do_exit(int status);
 PUBLIC int 		do_fork();
 PUBLIC void 	do_wait();
+
+/*mm/exec.c*/
+PUBLIC int 		do_exec();
+
 /*-------------------------Lib Function--------------------------------*/
 /*lib/open.c*/
 PUBLIC int 		open(const char *pathname, int flags);
@@ -145,6 +151,14 @@ PUBLIC int 		wait(int * status);
 /* lib/printf.c */
 PUBLIC  int     printf(const char *fmt, ...);
 PUBLIC  int 	printl(const char *fmt, ...);/*Low level write*/
+
+/*lib/exec.c*/
+PUBLIC int 		exec(const char * path);
+PUBLIC int 		execl(const char *path, const char *arg, ...);
+PUBLIC int 		execv(const char *path, char * argv[]);
+
+/*lib/stat.c*/
+PUBLIC int 		stat(const char *path, struct stat *buf);
 
 
 /* -------------------系统调用 - 系统级 ------------------------------------*/

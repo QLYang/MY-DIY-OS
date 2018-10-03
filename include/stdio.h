@@ -46,6 +46,14 @@ struct time {
 
 #define  BCD_TO_DEC(x)      ( (x >> 4) * 10 + (x & 0x0f) )
 
+struct stat {
+	int st_dev;		/* major/minor device number */
+	int st_ino;		/* i-node number */
+	int st_mode;		/* file mode, protection bits, etc. */
+	int st_rdev;		/* device ID (if special file) */
+	int st_size;		/* file size */
+};
+
 /*========================*
  * printf, printl, printx *
  *========================*
@@ -116,5 +124,15 @@ PUBLIC int	wait		(int * status);
 /* lib/syslog.c */
 PUBLIC	int	syslog		(const char *fmt, ...);
 
+/*lib/exec.c*/
+PUBLIC int 				exec(const char * path);
+PUBLIC int 				execv(const char *path, char * argv[]);
+PUBLIC int 				execl(const char *path, const char *arg, ...);
+
+/*mm/exec.c*/
+PUBLIC int 				do_exec();
+
+/*lib/stat.c*/
+PUBLIC int 				stat(const char *path, struct stat *buf);
 
 #endif

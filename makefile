@@ -38,11 +38,14 @@ src36=mm/main.c
 src37=mm/forkexit.c
 src38=lib/exit.c
 src39=lib/wait.c
+src40=lib/exec.c
+src41=mm/exec.c
+src42=lib/stat.c
 
 src=$(src1) $(src2) $(src3) $(src4) $(src5) $(src6) $(src7) $(src8) $(src9) $(src10) $(src11) $(src12) $(src13) $(src14) \
 	$(src15) $(src16) $(src17) $(src18) $(src19) $(src20) $(src21) $(src22) $(src23) $(src24) $(src25) $(src26) \
 	$(src27) $(src28) $(src29) $(src30) $(src31) $(src32) $(src33) $(src34) $(src35) $(src36) $(src37) $(src38) \
-	$(src39)
+	$(src39) $(src40) $(src41) $(src42)
 #Entry Point
 ENTRY_POINT=0x1000
 #Target
@@ -84,7 +87,7 @@ del_debug_file:
 runtime:
 	ar rcs lib/c_runtime.a syscall.o lib_close.o lib_exit.o  lib_fork.o lib_getpid.o \
 	lib_open.o lib_printf.o lib_read.o lib_unlink.o lib_wait.o lib_write.o \
-	lib_misc.o k_lib.o k_liba.o vsprintf.o
+	lib_misc.o k_lib.o k_liba.o vsprintf.o lib_exec.o lib_stat.o
 
 #must add ';' before define! Change bochsrc
 evething:$(src)
@@ -137,6 +140,9 @@ evething:$(src)
 	gcc $(gcc-flag) -c $(src37) -o mm_forkexit.o
 	gcc $(gcc-flag) -c $(src38) -o lib_exit.o
 	gcc $(gcc-flag) -c $(src39) -o lib_wait.o
+	gcc $(gcc-flag) -c $(src40) -o lib_exec.o
+	gcc $(gcc-flag) -c $(src41) -o mm_exec.o
+	gcc $(gcc-flag) -c $(src42) -o lib_stat.o
 
 	ld -s -Ttext $(ENTRY_POINT) -m elf_i386 kernel.o k_lib.o start.o init8259A.o \
 	global.o k_liba.o protect.o main.o clock_interruption.o syscall.o proc.o \
@@ -144,7 +150,7 @@ evething:$(src)
 	 systask.o hd.o fs_main.o fs_misc.o fs_open.o lib_open.o lib_close.o \
 	 fs_read_write.o lib_read.o lib_write.o lib_getpid.o lib_syslog.o fs_disklog.o \
 	 fs_link.o lib_unlink.o lib_fork.o mm_main.o mm_forkexit.o lib_exit.o lib_wait.o \
-	 -o $(tar3)
+	 lib_exec.o mm_exec.o lib_stat.o -o $(tar3)
 
 	sudo mount -o loop $(img) /mnt/floppy/
 	sudo cp $(tar3) /mnt/floppy/ -v

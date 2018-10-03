@@ -67,6 +67,13 @@ struct 		file_desc {
 	struct 	inode*	fd_inode;	/**< Ptr to the i-node */
 };
 
+struct stat {
+	int st_dev;		/* major/minor device number */
+	int st_ino;		/* i-node number */
+	int st_mode;		/* file mode, protection bits, etc. */
+	int st_rdev;		/* device ID (if special file) */
+	int st_size;		/* file size */
+};
 /*---------------------Read-Write sector-----------------------*/
 #define RD_SECT(dev,sect_nr) rw_sector(DEV_READ, \
 				       dev,				\

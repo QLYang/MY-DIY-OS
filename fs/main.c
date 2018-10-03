@@ -53,6 +53,9 @@ PUBLIC void task_fs()
 		case EXIT:
 			fs_msg.RETVAL = fs_exit();
 			break;
+		case STAT:
+			fs_msg.RETVAL = do_stat();
+			break;
 		default:
 			printl("fs_msg:%d",fs_msg.type);
 			dump_msg("FS::unknown message:", &fs_msg);
@@ -70,7 +73,7 @@ PUBLIC void task_fs()
 	msg_name[UNLINK] = "UNLINK";
 	msg_name[FORK]   = "FORK";
 	msg_name[EXIT]   = "EXIT";
-	/* msg_name[STAT]   = "STAT"; */
+	msg_name[STAT]   = "STAT";
 
 	switch (msgtype) {
 		case UNLINK:
@@ -83,7 +86,7 @@ PUBLIC void task_fs()
 		case FORK:
 		/* case LSEEK: */
 		case EXIT:
-		/* case STAT: */
+		case STAT:
 		case RESUME_PROC:
 		case DISK_LOG:
 			break;
