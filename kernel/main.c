@@ -118,6 +118,8 @@ PUBLIC int kernel_main()
 
 	while(1){}
 }
+
+static void shabby_shell(const char * tty_name);
 /*======================================================================*
                                Init
  *======================================================================*/
@@ -133,21 +135,32 @@ void Init()
 	/* extract `cmd.tar' */
 	untar("/cmd.tar");
 
-	int pid = fork();
-	if (pid != 0) { /* parent process */
-		int s;
-		int child = wait(&s);
-		printf("child (%d) exited with status: %d.\n", child, s);
+	char * tty_list[] = {"/dev_tty1", "/dev_tty2"};
 
+	int i;
+	for (i = 0; i < sizeof(tty_list) / sizeof(tty_list[0]); i++) {/*first time is right,second is wrong*/
+		int pid = fork();
+		if (pid != 0) { /* parent process */						/*fork or close*/
+			printf("[parent is running, child pid:%d]\n", pid);
+		}
+		else {	/* child process */
+			printf("[child is running, pid:%d]\n", getpid());
+
+			close(fd_stdin);
+			close(fd_stdout);
+
+			shabby_shell(tty_list[i]);
+			assert(0);
+		}
 	}
-	else {	/* child process */
-		execl("/echo", "echo", "hello", "world", 0);
-	}
+
 	while (1) {
 		int s;
 		int child = wait(&s);
 		printf("child (%d) exited with status: %d.\n", child, s);
 	}
+
+	assert(0);
 }
 /*======================================================================*
                                TestA
@@ -278,4 +291,67 @@ PUBLIC void untar(const char * filename)
 	close(fd);
 
 	printf(" done]\n");
+}
+
+/*****************************************************************************
+ *                                shabby_shell
+ *****************************************************************************/
+static void shabby_shell(const char * tty_name)
+{
+	int fd_stdin  = open(tty_name, O_RDWR);
+	assert(fd_stdin  == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
+
+	char rdbuf[128];
+
+	while (1) {
+		write(1, "$ ", 2);
+		int r = read(0, rdbuf, 70);
+		rdbuf[r] = 0;
+
+		int argc = 0;
+		char * argv[PROC_ORIGIN_STACK];
+		char * p = rdbuf;
+		char * s;
+		int word = 0;
+		char ch;
+		do {
+			ch = *p;
+			if (*p != ' ' && *p != 0 && !word) {
+				s = p;
+				word = 1;
+			}
+			if ((*p == ' ' || *p == 0) && word) {
+				word = 0;
+				argv[argc++] = s;
+				*p = 0;
+			}
+			p++;
+		} while(ch);
+		argv[argc] = 0;
+
+		int fd = open(argv[0], O_RDWR);
+		if (fd == -1) {
+			if (rdbuf[0]) {
+				write(1, "{", 1);
+				write(1, rdbuf, r);
+				write(1, "}\n", 2);
+			}
+		}
+		else {
+			close(fd);
+			int pid = fork();
+			if (pid != 0) { /* parent */
+				int s;
+				wait(&s);
+			}
+			else {	/* child */
+				execv(argv[0], argv);
+			}
+		}
+	}
+
+	close(1);
+	close(0);
 }

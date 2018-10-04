@@ -35,7 +35,7 @@ void TestB();
 void TestC();
 PUBLIC int 		get_ticks();
 PUBLIC void 	panic(const char *fmt, ...);
-PUBLIC void untar(const char * filename);
+PUBLIC void 	untar(const char * filename);
 
 /*systask.c*/
 PUBLIC void 	task_sys();

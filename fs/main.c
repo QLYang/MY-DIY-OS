@@ -57,9 +57,9 @@ PUBLIC void task_fs()
 			fs_msg.RETVAL = do_stat();
 			break;
 		default:
-			printl("fs_msg:%d",fs_msg.type);
-			dump_msg("FS::unknown message:", &fs_msg);
-			assert(0);
+			printl("fs_msg:%d\n",fs_msg.type);
+			dump_msg("FS::unknown message:\n", &fs_msg);
+			//assert(0);
 			break;
 		}
 
@@ -76,22 +76,24 @@ PUBLIC void task_fs()
 	msg_name[STAT]   = "STAT";
 
 	switch (msgtype) {
-		case UNLINK:
 		case OPEN:
+		case FORK:
+			dump_fd_graph("%s just finished.", msg_name[msgtype]);
+			break;
+		case UNLINK:
+
 		case CLOSE:
 		case READ:
 		case WRITE:
-			dump_fd_graph("%s just finished.", msg_name[msgtype]);
-			break;
-		case FORK:
+
 		/* case LSEEK: */
 		case EXIT:
 		case STAT:
 		case RESUME_PROC:
 		case DISK_LOG:
 			break;
-		default:
-			assert(0);
+		default:;
+			//assert(0);
 		}
 #endif
 

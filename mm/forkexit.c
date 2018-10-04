@@ -101,9 +101,10 @@ PUBLIC int do_fork()
 		  (PROC_IMAGE_SIZE_DEFAULT - 1) >> LIMIT_4K_SHIFT,
 		  DA_LIMIT_4K | DA_32 | DA_DRW | PRIVILEGE_USER << 5);
 	/* tell FS, see fs_fork() */
-	fs_msg.type = FORK;
-	fs_msg.PID = child_pid;
-	send_recv(BOTH, TASK_FS, &fs_msg);
+	MESSAGE msg2fs;
+	msg2fs.type = FORK;
+	msg2fs.PID = child_pid;
+	send_recv(BOTH, TASK_FS, &msg2fs);
 	/* child PID will be returned to the parent proc */
 	mm_msg.PID = child_pid;
 
@@ -165,9 +166,10 @@ PUBLIC void do_exit(int status)
 	struct proc * p = &proc_table[pid];
 
 	/* tell FS, see fs_exit() */
-	fs_msg.type = EXIT;
-	fs_msg.PID = pid;
-	send_recv(BOTH, TASK_FS, &fs_msg);
+	MESSAGE msg2fs;
+	msg2fs.type = EXIT;
+	msg2fs.PID = pid;
+	send_recv(BOTH, TASK_FS, &msg2fs);
 
 	free_mem(pid);
 
