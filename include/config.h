@@ -3,7 +3,7 @@
 /*
  * disk log
  */
-#define ENABLE_DISK_LOG  /*Dont forget to change the denfinition of SYSLOG in const.h*/
+//#define ENABLE_DISK_LOG  /*Dont forget to change the denfinition of SYSLOG in const.h*/
 #define SET_LOG_SECT_SMAP_AT_STARTUP
 #define MEMSET_LOG_SECTS
 #define	NR_SECTS_FOR_LOG		NR_DEFAULT_FILE_SECTS

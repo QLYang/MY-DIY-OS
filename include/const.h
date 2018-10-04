@@ -176,6 +176,8 @@ enum msgtype {
 #define	NAME_LEN			u.m3.m3i2
 #define	BUF_LEN				u.m3.m3i3
 
+#define	OFFSET				u.m3.m3i2
+#define	WHENCE				u.m3.m3i3
 /*hd_ioctl p->REQUEST*/
 #define	DIOCTL_GET_GEO		1
 
@@ -249,6 +251,7 @@ enum msgtype {
 /*stdio*/
 #define	O_CREAT		1
 #define	O_RDWR		2
+#define	O_TRUNC		4
 
 #define SEEK_SET	1
 #define SEEK_CUR	2

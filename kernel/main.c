@@ -256,11 +256,20 @@ PUBLIC void untar(const char * filename)
 
 	char buf[SECTOR_SIZE * 16];
 	int chunk = sizeof(buf);
+	int i = 0;
+	int bytes = 0;
 
 	while (1) {
-		read(fd, buf, SECTOR_SIZE);
-		if (buf[0] == 0)
+		bytes = read(fd, buf, SECTOR_SIZE);
+		assert(bytes == SECTOR_SIZE); /* size of a TAR file
+					       * must be multiple of 512
+					       */
+		if (buf[0] == 0) {
+			if (i == 0)
+				printf("    need not unpack the file.\n");
 			break;
+		}
+		i++;
 
 		struct posix_tar_header * phdr = (struct posix_tar_header *)buf;
 
@@ -271,26 +280,35 @@ PUBLIC void untar(const char * filename)
 			f_len = (f_len * 8) + (*p++ - '0'); /* octal */
 
 		int bytes_left = f_len;
-		int fdout = open(phdr->name, O_CREAT | O_RDWR);
+		int fdout = open(phdr->name, O_CREAT | O_RDWR | O_TRUNC);
 		if (fdout == -1) {
 			printf("    failed to extract file: %s\n", phdr->name);
 			printf(" aborted]\n");
+			close(fd);
 			return;
 		}
-		printf("    %s (%d bytes)\n", phdr->name, f_len);
+		printf("    %s\n", phdr->name);
 		while (bytes_left) {
 			int iobytes = min(chunk, bytes_left);
 			read(fd, buf,
 			     ((iobytes - 1) / SECTOR_SIZE + 1) * SECTOR_SIZE);
-			write(fdout, buf, iobytes);
+			bytes = write(fdout, buf, iobytes);
+			assert(bytes == iobytes);
 			bytes_left -= iobytes;
 		}
 		close(fdout);
 	}
 
+	if (i) {
+		lseek(fd, 0, SEEK_SET);
+		buf[0] = 0;
+		bytes = write(fd, buf, 1);
+		assert(bytes == 1);
+	}
+
 	close(fd);
 
-	printf(" done]\n");
+	printf(" done, %d files extracted]\n", i);
 }
 
 /*****************************************************************************

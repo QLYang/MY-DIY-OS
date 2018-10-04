@@ -56,10 +56,13 @@ PUBLIC void task_fs()
 		case STAT:
 			fs_msg.RETVAL = do_stat();
 			break;
+		case LSEEK:
+			fs_msg.OFFSET = do_lseek();
+			break;
 		default:
 			printl("fs_msg:%d\n",fs_msg.type);
 			dump_msg("FS::unknown message:\n", &fs_msg);
-			//assert(0);
+			assert(0);
 			break;
 		}
 
@@ -85,15 +88,14 @@ PUBLIC void task_fs()
 		case CLOSE:
 		case READ:
 		case WRITE:
-
-		/* case LSEEK: */
+		case LSEEK:
 		case EXIT:
 		case STAT:
 		case RESUME_PROC:
 		case DISK_LOG:
 			break;
 		default:;
-			//assert(0);
+			assert(0);
 		}
 #endif
 
@@ -136,9 +138,14 @@ PRIVATE void init_fs()
 	assert(dd_map[MAJOR(ROOT_DEV)].driver_nr != INVALID_DRIVER);
 	send_recv(BOTH, dd_map[MAJOR(ROOT_DEV)].driver_nr, &driver_msg);
 
-	/* make FS */
-	mkfs();
+	/* read the super block of ROOT DEVICE */
+	RD_SECT(ROOT_DEV, 1);
 
+	sb = (struct super_block *)fsbuf;
+	if (sb->magic != MAGIC_V1) {
+		printl("{FS} mkfs\n");
+		mkfs(); /* make FS */
+	}
 	/* load super block of ROOT */
 	read_super_block(ROOT_DEV);
 

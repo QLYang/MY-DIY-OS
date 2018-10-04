@@ -95,6 +95,7 @@ PUBLIC void 	sync_inode(struct inode * p);
 /*fs/open.c*/
 PUBLIC int 		do_open();
 PUBLIC int 		do_close();
+PUBLIC int 		do_lseek();
 
 /*fs/misc.c*/
 PUBLIC int 		search_file(char * path);
@@ -160,6 +161,8 @@ PUBLIC int 		execv(const char *path, char * argv[]);
 /*lib/stat.c*/
 PUBLIC int 		stat(const char *path, struct stat *buf);
 
+/*lib/lssek.c*/
+PUBLIC int 		lseek(int fd, int offset, int whence);
 
 /* -------------------系统调用 - 系统级 ------------------------------------*/
 /* proc.c */
